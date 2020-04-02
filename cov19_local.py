@@ -15,7 +15,7 @@ def load_RKI(filename, LandkreisID):
                 path to '*.csv' file downloaded from the RKI.
     
     LandkreisID : str
-                String with 5 number enteries to select the specific county.
+                String with 5 number entries to select the specific county.
     
     return
     ======
@@ -116,10 +116,10 @@ def load_RKI(filename, LandkreisID):
 
 def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_beatmung=0.05):
     '''
-    Plots cumulative case numbers aganist time for the specific county. Fits for any dataset 
-    larger than eight a exponential function and estimates the doubelling time. For the fit only 
-    the last eight datapoints are used to get a recent description of the evolution. Estimates the 
-    the doubeling time from every fit by taking the fitting constants b of the ``y = a * exp(b * x)``
+    Plots cumulative case numbers against time for the specific county. Fits for any dataset 
+    larger than eight a exponential function and estimates the doubling time. For the fit only 
+    the last eight data points are used to get a recent description of the evolution. Estimates the 
+    the doubling time from every fit by taking the fitting constants b of the ``y = a * exp(b * x)``
     underlying theory into account::
     
     ``DT = ln(2)/b``
@@ -131,7 +131,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
           Cumulative number of cases.
     
     day : np.array
-          String with 5 number enteries to select the specific county.
+          String with 5 number entries to select the specific county.
     
     name : str
             Name of specific region
@@ -149,7 +149,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     ======
     
     DT : list
-        Contains name of county, day array and DT array containing the 8 last datapoints 
+        Contains name of county, day array and DT array containing the 8 last data points 
         where fit was possible
     
         name : str
@@ -159,7 +159,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
             Array of 8 days before and including the fit day
     
         val_DT : list
-            list containing the calculated day-depending doubleling times
+            list containing the calculated day-depending doubling times
     '''
     import matplotlib.pyplot as plt
     import numpy as np
@@ -189,7 +189,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     
     x = np.arange(10,40,0.5)
     
-    # fit only when there are more than 6 datapoints and cases every day.
+    # fit only when there are more than 6 data points and cases every day.
     data_points = range(8, len(day)+1)
     
     DTs = []
@@ -312,13 +312,13 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
 
 def plot_DT(DT, ncol=4, nrow=3):
     '''
-    Plots day-dependent doubeling time against time for the selected counties.
+    Plots day-dependent doubling time against time for the selected counties.
     
     input
     ======
     
     DT : list
-        Contains name of county, day array and DT array containing the 8 last datapoints 
+        Contains name of county, day array and DT array containing the 8 last data-points 
         where fit was possible
     
         name : str
@@ -328,10 +328,10 @@ def plot_DT(DT, ncol=4, nrow=3):
             Array of 8 days before and including the fit day
     
         val_DT : list
-            list containing the calculated day-depending doubleling times
+            list containing the calculated day-depending doubling times
     
     ncol : int
-        Number of colums in plot (should not be changed for now.)
+        Number of columns in plot (should not be changed for now.)
 
     nrow : int
         Number of rows in plot (should not be changed for now.)
@@ -349,7 +349,7 @@ def plot_DT(DT, ncol=4, nrow=3):
     axs[0,0].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
     axs[0,1].set_title('Evolution of the Doubeling Time for German Counties')
     axs[0,2].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
-    axs[0,3].set_title('Evolution of the Doubeling Time for German Counties')
+    axs[0,3].set_title('Evolution of the Doubling Time for German Counties')
 
 
     
@@ -442,7 +442,7 @@ def plot_DT(DT, ncol=4, nrow=3):
 
     
     axs[0,0].set_ylabel('Verdopplungszeiten (Tage)')
-    axs[1,0].set_ylabel('Doubeling Time (days)')
+    axs[1,0].set_ylabel('Doubling Time DT (days)')
     axs[2,0].set_ylabel('Verdopplungszeiten (Tage)')
 
     
