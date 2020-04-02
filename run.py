@@ -26,7 +26,7 @@ for lkid in LK_ID:
     if True: #if lkid == '09182': # to check only one county - nur fuer einen Landkreis
         
         # load from specific csv file
-        num, day, month, name, LK_ids = load_RKI('data_RKI/RKI_COVID19_Bayern_2020-04-01.csv', lkid)
+        num, day, month, name, LK_ids = load_RKI('data_RKI/RKI_COVID19_Bayern_2020-04-02.csv', lkid)
         
         # specify capacity of intensive care for the individual counties - Beatmungskapazitaet
 
