@@ -1,6 +1,6 @@
 # COVID19Dahoam
 
-https://zenodo.org/badge/252294531.svg
+<a href="https://zenodo.org/badge/latestdoi/252294531"><img src="https://zenodo.org/badge/252294531.svg" alt="DOI"></a>
 
 A tool to analyse the COVID19 case numbers and doubling times on German county scale.
 
