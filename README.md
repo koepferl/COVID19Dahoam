@@ -1,4 +1,7 @@
 # COVID19Dahoam
+
+DOI: 10.5281/zenodo.3738972
+
 A tool to analyse the COVID19 case numbers and doubling times on German county scale.
 
 Here the diagrams for the 96 Bavarian counties (more coming) of the evolution of the Corona cases are provided, analysed and the doubling times are given. The corresponding code to perform this analysis is provided as well. The plots are updated every day.
