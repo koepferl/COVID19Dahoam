@@ -4,7 +4,7 @@ from pylab import *
 # Load of Input Data (Daten laden) #
 ####################################
 
-def load_RKI(filename, LandkreisID):  
+def load_RKI(filename, LandkreisID, state_name ='Bavaria'):  
     '''
     Reads file of the RKI database and selects the relevant data for the specific county.
     
@@ -16,6 +16,9 @@ def load_RKI(filename, LandkreisID):
     
     LandkreisID : str
                 String with 5 number entries to select the specific county.
+    
+    state_name : str, default = 'Bavaria'
+                Name of the state.
     
     return
     ======
@@ -35,6 +38,9 @@ def load_RKI(filename, LandkreisID):
     dic_LK : dict={'name', 'ID'}
             Alphabetical sorted names of counties and corresponding IDs
     
+    state : li[dat_state, num_state, name_state]
+            List of dates, cumulative case numbers and state name
+    
     '''
     
     import numpy as np
@@ -44,6 +50,14 @@ def load_RKI(filename, LandkreisID):
                            usecols=(9,2,8,5,6),
                            dtype={'names': ('lkID', 'lk_name', 'datum', 'fall', 'tod'), 'formats': ( 'S6', 'S40', 'S10', 'i4', 'i4')})
     
+    
+    # state average
+    dat_state = np.unique(daten_RKI['datum'])
+    case_state = []
+    
+    for dat in dat_state:
+        case_state.append(np.sum(daten_RKI['fall'][daten_RKI['datum'] == dat]))
+    num_state = np.cumsum(np.array(case_state))
     
     # select unique region
     indexes = np.unique(daten_RKI['lkID'], return_index=True)[1]
@@ -108,7 +122,7 @@ def load_RKI(filename, LandkreisID):
         umonth[i] = RKI_tab['month'][cond][0]
         uyear[i] = RKI_tab['year'][cond][0]
         
-    return np.cumsum(ufall), uday, umonth, region_name, dic_LK#, uyear, udate
+    return np.cumsum(ufall), uday, umonth, region_name, dic_LK, [num_state, dat_state, state_name]#, uyear, udate
 
 ##################################################################################################
 # Logarithmic Plot of Cumulative Cases (Logarithmische Darstellung der aufsummierten Fallzahlen) #
@@ -176,6 +190,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     ####
     # move to March time frame
     #########
+    day_real = np.copy(day)
     day[month == 2] = day[month == 2] - 29
     day[month == 1] = day[month == 1] - 29 - 31
     day[month == 4] = day[month == 4] + 31
@@ -228,8 +243,9 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
         ########
         # plot fit
         #########
+        day_label = 'Fit am ' + str(int(day_real[cut-1])) + '.' + str(int(month[cut-1]))
         plt.semilogy(x, func(x, *popt), '-', color=plt.cm.viridis(int(col)), 
-                     label='Fit am ' + str(int(day[cut-1])) + '.3')
+                     label=day_label)
         
         colapp.append(int(col))
         col = col + 256 / len(data_points)         
@@ -310,7 +326,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
 # Doubeling Time (Verdopplungszeit) #
 #####################################
 
-def plot_DT(DT, ncol=4, nrow=3):
+def plot_DT(DT, state, ncol=4, nrow=3):
     '''
     Plots day-dependent doubling time against time for the selected counties.
     
@@ -330,6 +346,9 @@ def plot_DT(DT, ncol=4, nrow=3):
         val_DT : list
             list containing the calculated day-depending doubling times
     
+    state : list
+            output from load_RKI
+    
     ncol : int
         Number of columns in plot (should not be changed for now.)
 
@@ -342,7 +361,48 @@ def plot_DT(DT, ncol=4, nrow=3):
     Saves diagram as PDF.
     
     '''
-
+    ######################################
+    # DT for state
+    #######################
+    
+    ####
+    # move to March time frame
+    #########
+    
+    dat_states = state[1]
+    
+    state_day = []
+    for i in range(len(dat_states)):
+        y, m, d = dat_states[i].split('-')
+        if m == '01': state_day.append(int(d) - 29 - 31)
+        if m == '02': state_day.append(int(d) - 29)
+        if m == '03': state_day.append(int(d))
+        if m == '04': state_day.append(int(d) + 31) 
+    
+    #########
+    # fit
+    #########
+    def func(x, a, b):#, c):
+        return a * np.exp(b * x)# + c
+        #return a * b**(c*x)
+    
+    x = np.arange(10,40,0.5)
+    
+    # fit only when there are more than 8 data points and cases every day.
+    data_points = range(8, len(state_day)+1)
+    state_day = np.array(state_day)
+    state_num = np.array(state[0])
+    DTs_state = []
+    
+    from scipy.optimize import curve_fit
+    for cut in data_points:
+        popt, pcov = curve_fit(func, state_day[cut-8:cut], state_num[cut-8:cut])
+        
+        #########
+        # doubling time
+        #########
+        DT_state = np.round(np.log(2) / popt[1],2)
+        DTs_state.append(DT_state)
 
     fig, axs = plt.subplots(nrow, ncol, figsize=(28,21))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.05, hspace=0.05)
@@ -430,7 +490,10 @@ def plot_DT(DT, ncol=4, nrow=3):
             line_col = 20 + 30 * (96 - i)
             
         key = sorted_keys[i]
+        if i in [0, 8 ,16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96]:
+            ax.plot(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
         ax.plot(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
+        
     
     ######
     # axis
@@ -461,4 +524,4 @@ def plot_DT(DT, ncol=4, nrow=3):
             ax.text(31, -0.9, 'April')
     
     #plt.show()
-    fig.savefig('DT.pdf', dpi=300, overwrite=True, bbox_inches='tight')
+    fig.savefig('DT_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')

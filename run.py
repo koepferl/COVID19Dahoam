@@ -39,4 +39,4 @@ for lkid in LK_ID:
                                geraet_min=kapazitaet[0], geraet_max=kapazitaet[1], anteil_beatmung=0.05)
 
 # doubeling time plot - Verdopplungszeitdiagramm
-plot_DT(DT)
+plot_DT(DT, state)
