@@ -185,7 +185,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     
     fig, ax = plt.subplots(figsize=(10,8))
     plt.title(name)
-    ax.axis([13, 40, 1, 1e5])
+    ax.axis([13, 50, 1, 1e5])
     
     ####
     # move to March time frame
@@ -202,7 +202,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
         return a * np.exp(b * x)# + c
         #return a * b**(c*x)
     
-    x = np.arange(10,40,0.5)
+    x = np.arange(10,50,0.5)
     
     # fit only when there are more than 6 data points and cases every day.
     data_points = range(8, len(day)+1)
@@ -302,16 +302,16 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     for axis in [ax.xaxis, ax.yaxis]:
         axis.set_major_formatter(ScalarFormatter())
     ax.grid(True, which="both")
-    plt.xticks(np.arange(14, 40, 2))
-    ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7])
+    plt.xticks(np.arange(14, 50, 2))
+    ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
     
     tx1 = ax.text(13, 0.5, 'Maerz')
     tx2 = ax.text(31, 0.5, 'April')
     
-    ax.text(40.5, 3, 'Christine Greif', fontsize=8)
-    link = ax.text(40.5, 2.4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax.text(40.5, 1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax.text(40.5, 1, 'Data: NPGEO-DE', fontsize=8)
+    ax.text(50.5, 3, 'Christine Greif', fontsize=8)
+    link = ax.text(50.5, 2.4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
+    ax.text(50.5, 1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    ax.text(50.5, 1, 'Data: NPGEO-DE', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
     ax.set_ylabel('Fallzahlen')
     lgd = ax.legend(loc='best', bbox_to_anchor=(1.0, 1.01))
@@ -386,7 +386,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         return a * np.exp(b * x)# + c
         #return a * b**(c*x)
     
-    x = np.arange(10,40,0.5)
+    x = np.arange(10,50,0.5)
     
     # fit only when there are more than 8 data points and cases every day.
     data_points = range(8, len(state_day)+1)
@@ -492,15 +492,18 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         key = sorted_keys[i]
         if i in [0, 8 ,16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96]:
             ax.plot(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
+            print state[2], DTs_state[-1], int(state_day[7:][-1])
+            
         ax.plot(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
+        print DT[key][2][-1], int(DT[key][1][-1]), DT[key][0]
         
     
     ######
     # axis
     
-    link = axs[2,3].text(22, -1.3, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(22, -1.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(22, -1.9, 'Data: NPGEO-DE', fontsize=8)
+    link = axs[2,3].text(27, -1.3, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs[2,3].text(27, -1.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs[2,3].text(27, -1.9, 'Data: NPGEO-DE', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
     
@@ -511,11 +514,11 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
     for ax in axs.reshape(-1):
         ax.set_ylim(0,10.9)
-        ax.set_xlim(13,40)
+        ax.set_xlim(13,50)
     
         ax.grid(True, which="both")
-        ax.set_xticks(np.arange(14, 40, 2))
-        ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7])
+        ax.set_xticks(np.arange(14, 50, 2))
+        ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
     
         ax.legend(loc='upper left')
     
