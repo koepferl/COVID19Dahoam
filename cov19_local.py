@@ -208,6 +208,8 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     data_points = range(8, len(day)+1)
     
     DTs = []
+    Ntot_today = []
+    Ntot_week = []
     
     col = 30
     colapp = []
@@ -221,6 +223,11 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
         #popt, pcov = curve_fit(func, day[:cut], num[:cut])
         popt, pcov = curve_fit(func, day[cut-8:cut], num[cut-8:cut])
         #print len(day[cut-8:cut])
+        
+        #####
+        # loglog
+        Ntot_today.append(num[cut-8:cut][-1])
+        Ntot_week.append(num[cut-8:cut][-1] - num[cut-8:cut][0])
         
         #########
         # doubling time
@@ -320,7 +327,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
                 bbox_extra_artists=(lgd, tx1, tx2,), bbox_inches='tight')
     
     
-    return [name, day[7:], DTs]
+    return [name, day[7:], DTs, Ntot_today, Ntot_week]
 
 #####################################
 # Doubeling Time (Verdopplungszeit) #
@@ -405,6 +412,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         DTs_state.append(DT_state)
 
     fig, axs = plt.subplots(nrow, ncol, figsize=(28,21))
+    fig2, axs2 = plt.subplots(nrow, ncol, figsize=(28,21))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.05, hspace=0.05)
     axs[0,0].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
     axs[0,1].set_title('Evolution of the Doubeling Time for German Counties')
@@ -443,58 +451,71 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         
         if i in range(0, 8): 
             ax = axs[0,0]
+            ax2 = axs2[0,0]
             line_col = 20 + 30 * (8 - i)
 
         if i in range(8, 16): 
             ax = axs[0,1]
+            ax2 = axs2[0,1]
             line_col = 20 + 30 * (16 - i)
 
         if i in range(16,24): 
             ax = axs[0,2]
+            ax2 = axs2[0,2]
             line_col = 20 + 30 * (24 - i)
 
         if i in range(24,32): 
             ax = axs[0,3]
+            ax2 = axs2[0,3]
             line_col = 20 + 30 * (32 - i)
 
         if i in range(32,40): 
             ax = axs[1,0]
+            ax2 = axs2[1,0]
             line_col = 20 + 30 * (40 - i)
 
         if i in range(40,48): 
             ax = axs[1,1]
+            ax2 = axs2[1,1]
             line_col = 20 + 30 * (48 - i)
 
         if i in range(48,56): 
             ax = axs[1,2]
+            ax2 = axs2[1,2]
             line_col = 20 + 30 * (56 - i)
 
         if i in range(56,64): 
             ax = axs[1,3]
+            ax2 = axs2[1,3]
             line_col = 20 + 30 * (64 - i)
 
         if i in range(64,72): 
             ax = axs[2,0]
+            ax2 = axs2[2,0]
             line_col = 20 + 30 * (72 - i)
 
         if i in range(72,80): 
             ax = axs[2,1]
+            ax2 = axs2[2,1]
             line_col = 20 + 30 * (80 - i)
 
         if i in range(80,88): 
             ax = axs[2,2]
+            ax2 = axs2[2,2]
             line_col = 20 + 30 * (88 - i)
 
         if i in range(88,96): 
             ax = axs[2,3]
+            ax2 = axs2[2,3]
             line_col = 20 + 30 * (96 - i)
             
         key = sorted_keys[i]
         if i in [0, 8 ,16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96]:
             ax.plot(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
             print state[2], DTs_state[-1], int(state_day[7:][-1])
-            
+        
         ax.plot(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
+        ax2.loglog(DT[key][3], DT[key][4], '.-', c = cmap(line_col), label=DT[key][0])
         print DT[key][2][-1], int(DT[key][1][-1]), DT[key][0]
         
     
@@ -504,6 +525,11 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     link = axs[2,3].text(27, -1.3, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs[2,3].text(27, -1.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs[2,3].text(27, -1.9, 'Data: NPGEO-DE', fontsize=8)
+    
+    link = axs2[2,3].text(27, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs2[2,3].text(27, 4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs2[2,3].text(27, 3, 'Data: NPGEO-DE', fontsize=8)
+    
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
     
@@ -526,5 +552,34 @@ def plot_DT(DT, state, ncol=4, nrow=3):
             ax.text(13, -0.9, 'Maerz/March')
             ax.text(31, -0.9, 'April')
     
+            
+    for ax2 in axs2.reshape(-1):
+        
+        from matplotlib.ticker import ScalarFormatter
+        for axis in [ax2.xaxis, ax2.yaxis]:
+            axis.set_major_formatter(ScalarFormatter())
+        ax2.grid(True, which="both")
+        
+        ax2.set_ylim(10.5,1000)
+        ax2.set_xlim(10.5,10000)
+        ax2.legend(loc='upper left')
+        
+        if ax2 in [axs2[2,0], axs2[2,1], axs2[2,2], axs2[2,3]]:
+            ax2.set_xlabel('Totale Fallzahlen (total number of cases)')
+        if ax2 in [axs2[0,0], axs2[1,0], axs2[2,0]]:
+            ax2.set_ylabel('Fallzahlen in der letzten Woche (number of new cases last week)')
+        
+        
+    
+    
     #plt.show()
     fig.savefig('DT_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
+    fig2.savefig('loglog_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
+    
+    #################
+    #plt.title(name)
+    
+    for i in range(len(sorted_keys)):
+        plt.loglog()
+    
+    
