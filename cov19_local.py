@@ -512,7 +512,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         key = sorted_keys[i]
         if i in [0, 8 ,16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96]:
             ax.plot(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
+            print '-' * 20
             print state[2], DTs_state[-1], int(state_day[7:][-1])
+            print '-' * 20
         
         ax.plot(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
         ax2.loglog(DT[key][3], DT[key][4], '.-', c = cmap(line_col), label=DT[key][0])
@@ -526,9 +528,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     axs[2,3].text(27, -1.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs[2,3].text(27, -1.9, 'Data: NPGEO-DE', fontsize=8)
     
-    link = axs2[2,3].text(27, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs2[2,3].text(27, 4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs2[2,3].text(27, 3, 'Data: NPGEO-DE', fontsize=8)
+    link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs2[2,3].text(35, 4.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs2[2,3].text(35, 4.25, 'Data: NPGEO-DE', fontsize=8)
     
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
@@ -539,7 +541,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(0,10.9)
+        ax.set_ylim(0,20.9)
         ax.set_xlim(13,50)
     
         ax.grid(True, which="both")
@@ -549,8 +551,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.legend(loc='upper left')
     
         if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-            ax.text(13, -0.9, 'Maerz/March')
-            ax.text(31, -0.9, 'April')
+            ax.text(13, -1.3, 'Maerz/March')
+            ax.text(31, -1.3, 'April')
     
             
     for ax2 in axs2.reshape(-1):
@@ -560,7 +562,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
             axis.set_major_formatter(ScalarFormatter())
         ax2.grid(True, which="both")
         
-        ax2.set_ylim(10.5,1000)
+        ax2.set_ylim(10.5,2000)
         ax2.set_xlim(10.5,10000)
         ax2.legend(loc='upper left')
         
