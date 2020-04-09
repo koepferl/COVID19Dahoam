@@ -413,7 +413,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     fig, axs = plt.subplots(nrow, ncol, figsize=(28,21))
     fig2, axs2 = plt.subplots(nrow, ncol, figsize=(28,21))
-    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.05, hspace=0.05)
+    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.1, hspace=0.1)
     axs[0,0].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
     axs[0,1].set_title('Evolution of the Doubeling Time for German Counties')
     axs[0,2].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
@@ -524,13 +524,13 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     ######
     # axis
     
-    link = axs[2,3].text(27, -1.3, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(27, -1.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(27, -1.9, 'Data: NPGEO-DE', fontsize=8)
+    link = axs[2,3].text(27, -2.6, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs[2,3].text(27, -3.1, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs[2,3].text(27, -3.6, 'Data: NPGEO-DE', fontsize=8)
     
     link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs2[2,3].text(35, 4.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs2[2,3].text(35, 4.25, 'Data: NPGEO-DE', fontsize=8)
+    axs2[2,3].text(35, 4.4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs2[2,3].text(35, 3.8, 'Data: NPGEO-DE', fontsize=8)
     
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
@@ -551,8 +551,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.legend(loc='upper left')
     
         if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-            ax.text(13, -1.3, 'Maerz/March')
-            ax.text(31, -1.3, 'April')
+            ax.text(13, -2, 'Maerz/March')
+            ax.text(31, -2, 'April')
     
             
     for ax2 in axs2.reshape(-1):
