@@ -199,8 +199,9 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     # fit
     #########
     def func(x, a, b):#, c):
-        return a * np.exp(b * x)# + c
+        #return a * np.exp(b * x)# + c #
         #return a * b**(c*x)
+        return np.log(a) + b * x  #log-linear
     
     x = np.arange(10,50,0.5)
     
@@ -215,28 +216,33 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     colapp = []
     print 'Tag  DTs'
     for cut in data_points:
-        #print num[:cut]
+        #print day[cut-8:cut]
+        #print num[cut-8:cut]
         
         #########        
         ### changed 8 fit
         #########
         #popt, pcov = curve_fit(func, day[:cut], num[:cut])
-        popt, pcov = curve_fit(func, day[cut-8:cut], num[cut-8:cut])
+        popt, pcov = curve_fit(func, day[cut-8:cut], np.log(num[cut-8:cut]))
         #print len(day[cut-8:cut])
         
         #####
         # loglog
+        cond_week = day[cut-8:cut] > day[cut-1] - 7
+        num_week = num[cut-8:cut][cond_week]
+        
         Ntot_today.append(num[cut-8:cut][-1])
-        Ntot_week.append(num[cut-8:cut][-1] - num[cut-8:cut][0])
+        Ntot_week.append(num_week[-1] - num_week[0])
         
         #########
         # doubling time
         #########
         DT = np.round(np.log(2) / popt[1],2)
+        #print DT#,  popt
         DTs.append(DT)
         #print popt, np.log(2) / popt[1]
 
-        print str(int(day[cut-1])) + '.' +  str(int(month[cut-1])), '%4.2f'%DT 
+        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT 
 
         #print("a =", popt[0], "+/-", pcov[0,0]**0.5)
         #print("b =", popt[1], "+/-", pcov[1,1]**0.5)
@@ -250,8 +256,8 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
         ########
         # plot fit
         #########
-        day_label = 'Fit am ' + str(int(day_real[cut-1])) + '.' + str(int(month[cut-1]))
-        plt.semilogy(x, func(x, *popt), '-', color=plt.cm.viridis(int(col)), 
+        day_label = 'Fit am ' + '%02d'%int(day_real[cut-1]) + '.' + '%02d'%int(month[cut-1]) + '; VZ: ' + '%5.2f'%DT + ' d'
+        plt.semilogy(x, np.exp(func(x, *popt)), '-', color=plt.cm.viridis(int(col)), 
                      label=day_label)
         
         colapp.append(int(col))
@@ -263,7 +269,7 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
         if cut == data_points[-1]:
             
             # Beatmungsampel
-            bedarf =  anteil_beatmung * func(x, *popt)
+            bedarf =  anteil_beatmung * np.exp(func(x, *popt))
             
             plt.semilogy(x, bedarf, 
                          '-', lw=3, color=plt.cm.Reds(200), 
@@ -276,14 +282,14 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
                          label='Ampel (Beatmungsbedarf ca. ' + str(int(anteil_beatmung*100)) + '%)')
             
             # Fehler
-            plt.semilogy(x, 0.05*func(x, 
+            plt.semilogy(x, 0.05*np.exp(func(x, 
                                  popt[0] - pcov[0,0]**0.5, 
-                                 popt[1] - pcov[1,1]**0.5), 
+                                 popt[1] - pcov[1,1]**0.5)), 
                                  #popt[2] - pcov[2,2]**0.5), 
                          '--', color='k', alpha=0.5, label='Unsicherheiten')
-            plt.semilogy(x, 0.05*func(x, 
+            plt.semilogy(x, 0.05*np.exp(func(x, 
                                  popt[0] + pcov[0,0]**0.5, 
-                                 popt[1] + pcov[1,1]**0.5), 
+                                 popt[1] + pcov[1,1]**0.5)), 
                                  #popt[2] + pcov[2,2]**0.5), 
                          '--', color='k', alpha=0.5)
     
@@ -315,17 +321,18 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     tx1 = ax.text(13, 0.5, 'Maerz')
     tx2 = ax.text(31, 0.5, 'April')
     
-    ax.text(50.5, 3, 'Christine Greif', fontsize=8)
-    link = ax.text(50.5, 2.4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax.text(50.5, 1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax.text(50.5, 1, 'Data: NPGEO-DE', fontsize=8)
+    ax.text(50.5, 9e4, 'Christine Greif', fontsize=8)
+    link = ax.text(50.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
+    ax.text(50.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    ax.text(50.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
     ax.set_ylabel('Fallzahlen')
-    lgd = ax.legend(loc='best', bbox_to_anchor=(1.0, 1.01))
+    lgd = ax.legend(loc='best', bbox_to_anchor=(1.0, 0.93))
     
     fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, 
                 bbox_extra_artists=(lgd, tx1, tx2,), bbox_inches='tight')
-    
+                
+    #raise Exception('stop')
     
     return [name, day[7:], DTs, Ntot_today, Ntot_week]
 
@@ -390,8 +397,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     # fit
     #########
     def func(x, a, b):#, c):
-        return a * np.exp(b * x)# + c
+        #return a * np.exp(b * x)# + c
         #return a * b**(c*x)
+        return np.log(a) + b * x
     
     x = np.arange(10,50,0.5)
     
@@ -403,7 +411,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
     from scipy.optimize import curve_fit
     for cut in data_points:
-        popt, pcov = curve_fit(func, state_day[cut-8:cut], state_num[cut-8:cut])
+        popt, pcov = curve_fit(func, state_day[cut-8:cut], np.log(state_num[cut-8:cut]))
         
         #########
         # doubling time
