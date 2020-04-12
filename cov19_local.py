@@ -23,8 +23,8 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
     return
     ======
     
-    fall :  np.array
-            Cumulative number of cases
+    dic :  dictionary {'fall': array, 'tod':array, 'gesund': array}
+           Array of cumulative number of cases
     
     uday :  np.array
             Individual days of notification to the RKI
@@ -47,16 +47,21 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
     daten_RKI = np.loadtxt(filename, 
                            skiprows=1, 
                            delimiter=',', 
-                           usecols=(9,2,8,5,6),
-                           dtype={'names': ('lkID', 'lk_name', 'datum', 'fall', 'tod'), 'formats': ( 'S6', 'S40', 'S10', 'i4', 'i4')})
+                           usecols=(9,2,8,5,6,-1),
+                           dtype={'names': ('lkID', 'lk_name', 'datum', 'fall', 'tod', 'gesund'), 'formats': ( 'S6', 'S40', 'S10', 'i4', 'i4', 'i4')})
     
     
     # state average
     dat_state = np.unique(daten_RKI['datum'])
     case_state = []
+    #tod_state = []
+    #gesund_state = []
     
     for dat in dat_state:
-        case_state.append(np.sum(daten_RKI['fall'][daten_RKI['datum'] == dat]))
+        case_state_dat = daten_RKI['fall'][daten_RKI['datum'] == dat]
+        #tod_state_dat = daten_RKI['tod'][daten_RKI['datum'] == dat]
+        #gesund_state_dat = daten_RKI['gesund'][daten_RKI['datum'] == dat]
+        case_state.append(np.sum(case_state_dat[case_state_dat > 0]))
     num_state = np.cumsum(np.array(case_state))
     
     # select unique region
@@ -100,8 +105,8 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
     
     # sum up unique dates
     from astropy.table import Table
-    RKI_tab = Table([daten_RKI['datum'], year, month, day, daten_RKI['fall'], daten_RKI['tod']], 
-                    names=('datum', 'year', 'month', 'day', 'fall', 'tod'))
+    RKI_tab = Table([daten_RKI['datum'], year, month, day, daten_RKI['fall'], daten_RKI['tod'], daten_RKI['gesund']],
+                    names=('datum', 'year', 'month', 'day', 'fall', 'tod', 'gesund'))
     
     #print RKI_tab
     
@@ -110,25 +115,37 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
     umonth = np.zeros(shape=udate.shape)
     uyear = np.zeros(shape=udate.shape)
     ufall = np.zeros(shape=udate.shape)
+    utod = np.zeros(shape=udate.shape)
+    ugesund = np.zeros(shape=udate.shape)
     
     #print RKI_tab['datum']
     
     for i in range(len(udate)):
         cond = (RKI_tab['datum'] == udate[i])
-        #print udate[i]
-        #print RKI_tab[cond]
-        ufall[i] = np.sum(RKI_tab['fall'][cond])
+
+        fall_day = RKI_tab['fall'][cond]
+        #print fall_day[fall_day < 0]
+        ufall[i] = np.sum(fall_day[fall_day > 0])
+        
+        tod_day = RKI_tab['tod'][cond]
+        utod[i] = np.sum(tod_day[tod_day > 0])
+        #print tod_day[tod_day < 0]
+        
+        gesund_day = RKI_tab['gesund'][cond]
+        ugesund[i] = np.sum(gesund_day[gesund_day > 0])
+        #print gesund_day[gesund_day < 0]
+        
         uday[i] = RKI_tab['day'][cond][0]
         umonth[i] = RKI_tab['month'][cond][0]
         uyear[i] = RKI_tab['year'][cond][0]
         
-    return np.cumsum(ufall), uday, umonth, region_name, dic_LK, [num_state, dat_state, state_name]#, uyear, udate
+    return {'fall': np.cumsum(ufall), 'tod': np.cumsum(utod), 'gesund':np.cumsum(ugesund)}, uday, umonth, region_name, dic_LK, [num_state, dat_state, state_name]#, uyear, udate
 
 ##################################################################################################
 # Logarithmic Plot of Cumulative Cases (Logarithmische Darstellung der aufsummierten Fallzahlen) #
 ##################################################################################################
 
-def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_beatmung=0.05):
+def plot_corona(num_dic, day, month, name, geraet_min=None, geraet_max=None, anteil_beatmung=0.05):
     '''
     Plots cumulative case numbers against time for the specific county. Fits for any dataset 
     larger than eight a exponential function and estimates the doubling time. For the fit only 
@@ -141,8 +158,8 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     Input
     =====
     
-    num : np.array
-          Cumulative number of cases.
+    num_dic :  dictionary {'fall': array, 'tod':array, 'gesund': array}
+           Array of cumulative number of cases
     
     day : np.array
           String with 5 number entries to select the specific county.
@@ -183,9 +200,13 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     print name
     print '-' * 30
     
+    num = num_dic['fall']
+    num_tod = num_dic['tod']
+    num_gesund = num_dic['gesund']
+    
     fig, ax = plt.subplots(figsize=(10,8))
     plt.title(name)
-    ax.axis([13, 50, 1, 1e5])
+    ax.axis([13, 50, 0.9, 1e5])
     
     ####
     # move to March time frame
@@ -304,7 +325,9 @@ def plot_corona(num, day, month, name, geraet_min=None, geraet_max=None, anteil_
     ####
     # gemeldete Fallzahlen
     #########
-    plt.semilogy(day, num, 'k+', label="Daten")
+    plt.semilogy(day, num, 'k+', label="COVID19 erkrankt")
+    plt.semilogy(day, num_tod, 'k*', label="davon verstorben")
+    plt.semilogy(day, num_gesund, 'ko', alpha=0.3, label="davon genesen")
     
     
     #############
