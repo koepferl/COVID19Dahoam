@@ -23,7 +23,7 @@ DT = {}
 
 # loop over all counties - Ausfuehren fuer alle Landkreise
 for lkid in LK_ID:
-    if True: #if lkid == '09162': # to check only one county - nur fuer einen Landkreis
+    if True:#if lkid == '09162': # ## to check only one county - nur fuer einen Landkreis
         
         # load from specific csv file
         num, day, month, name, LK_ids, state = load_RKI('data_RKI/RKI_COVID19_Bayern_2020-04-12.csv', lkid, state_name='Bavaria')
@@ -38,7 +38,7 @@ for lkid in LK_ID:
         else: kapazitaet = [None, None]
         
         # create plots for every county - Diagramme fuer alle Landkreise  
-        DT[lkid] = plot_corona(num, day, month, name=name, 
+        DT[lkid] = plot_corona(num, day, month, name=name, ID=lkid, 
                                geraet_min=kapazitaet[0], geraet_max=kapazitaet[1], anteil_beatmung=0.05)
 
 # doubeling time plot - Verdopplungszeitdiagramm

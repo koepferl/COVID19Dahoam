@@ -145,7 +145,19 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
 # Logarithmic Plot of Cumulative Cases (Logarithmische Darstellung der aufsummierten Fallzahlen) #
 ##################################################################################################
 
-def plot_corona(num_dic, day, month, name, geraet_min=None, geraet_max=None, anteil_beatmung=0.05):
+def get_people_of_county(asked_ID, filename = 'data_RKI/12411-001.csv'): 
+    import numpy as np
+
+    EW_ID, EW = np.loadtxt(filename, delimiter=';', 
+                       usecols=(0, -1), unpack=True, 
+                       dtype={'names': ('EW_ID', 'EW'), 'formats': ( 'S10', 'i4')})
+    
+    ID_str = asked_ID[1:]
+    return EW[EW_ID == ID_str][0]
+
+
+
+def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None, anteil_beatmung=0.05):
     '''
     Plots cumulative case numbers against time for the specific county. Fits for any dataset 
     larger than eight a exponential function and estimates the doubling time. For the fit only 
@@ -344,18 +356,37 @@ def plot_corona(num_dic, day, month, name, geraet_min=None, geraet_max=None, ant
     tx1 = ax.text(13, 0.5, 'Maerz')
     tx2 = ax.text(31, 0.5, 'April')
     
-    ax.text(50.5, 9e4, 'Christine Greif', fontsize=8)
-    link = ax.text(50.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax.text(50.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax.text(50.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
+    ax.text(54.5, 9e4, 'Christine Greif', fontsize=8)
+    link = ax.text(54.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
+    ax.text(54.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    ax.text(54.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
     ax.set_ylabel('Fallzahlen')
-    lgd = ax.legend(loc='best', bbox_to_anchor=(1.0, 0.93))
+    lgd = ax.legend(loc='best', bbox_to_anchor=(1.12, 0.93))
+    
+    # percent
+    #########
+    EW_county = get_people_of_county(asked_ID=ID)
+    
+    axi = ax.twinx()
+    
+    #print 'lim', ax.get_ylim(), ax.get_ylim()[0] / EW_county * 100, ax.get_ylim()[1] / EW_county * 100, EW_county
+    axi.set_ylim(ax.get_ylim()[0] / EW_county * 100 , ax.get_ylim()[1] / EW_county * 100 )
+    axi.set_yscale('log')
+    import matplotlib.ticker as mtick
+    import matplotlib.ticker as ticker
+    axi.yaxis.set_major_formatter(ScalarFormatter())
+    axi.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y,pos: ('{{:.{:1d}f}}%'.format(int(np.maximum(-np.log10(y),0)))).format(y)))
+    #axi.yaxis.set_major_formatter(FormatStrFormatter('%4d'))
+    #axi.yaxis.set_major_formatter(mtick.PercentFormatter())
+    axi.set_ylabel('Prozentualer Anteil zur Einwohnerzahl im Kreis')
     
     fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, 
                 bbox_extra_artists=(lgd, tx1, tx2,), bbox_inches='tight')
                 
     #raise Exception('stop')
+    
+    
     
     return [name, day[7:], DTs, Ntot_today, Ntot_week]
 
