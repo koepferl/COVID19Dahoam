@@ -178,6 +178,9 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     name : str
             Name of specific region
+    
+    ID : str 
+            ID of county in Germany e.g. '09182' for LK Miesbach
 
     geraet_min : int, None
             Minimum capacity of intensive care
@@ -217,7 +220,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     num_gesund = num_dic['gesund']
     
     fig, ax = plt.subplots(figsize=(10,8))
-    plt.title(name)
+    plt.title(name + ' (#' + ID +')')
     ax.axis([13, 50, 0.9, 1e5])
     
     ####
@@ -275,7 +278,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         DTs.append(DT)
         #print popt, np.log(2) / popt[1]
 
-        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT 
+        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT
 
         #print("a =", popt[0], "+/-", pcov[0,0]**0.5)
         #print("b =", popt[1], "+/-", pcov[1,1]**0.5)
@@ -341,6 +344,12 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     plt.semilogy(day, num_tod, 'k*', label="davon verstorben")
     plt.semilogy(day, num_gesund, 'ko', alpha=0.3, label="davon genesen")
     
+    print '+' * 30
+    print 'Sterberate (%): ', np.round(num_tod[-1] / num[-1] * 100, 2)
+    print 'Gesunde (%):    ', np.round(num_gesund[-1] / num[-1] * 100, 2)
+    print '+' * 30
+    
+    
     
     #############
     # formating
@@ -379,7 +388,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     axi.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y,pos: ('{{:.{:1d}f}}%'.format(int(np.maximum(-np.log10(y),0)))).format(y)))
     #axi.yaxis.set_major_formatter(FormatStrFormatter('%4d'))
     #axi.yaxis.set_major_formatter(mtick.PercentFormatter())
-    axi.set_ylabel('Prozentualer Anteil zur Einwohnerzahl im Kreis')
+    axi.set_ylabel('Prozentualer Anteil zur Gesamteinwohnerzahl (' + str(EW_county) + ') im Kreis')
     
     fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, 
                 bbox_extra_artists=(lgd, tx1, tx2,), bbox_inches='tight')
@@ -586,9 +595,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     ######
     # axis
     
-    link = axs[2,3].text(27, -2.6, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(27, -3.1, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(27, -3.6, 'Data: NPGEO-DE', fontsize=8)
+    link = axs[2,3].text(27, -3.6, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs[2,3].text(27, -4.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs[2,3].text(27, -5.6, 'Data: NPGEO-DE', fontsize=8)
     
     link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs2[2,3].text(35, 4.4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
@@ -603,7 +612,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(0,20.9)
+        ax.set_ylim(0,30.9)
         ax.set_xlim(13,50)
     
         ax.grid(True, which="both")
@@ -612,9 +621,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
         ax.legend(loc='upper left')
     
-        if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-            ax.text(13, -2, 'Maerz/March')
-            ax.text(31, -2, 'April')
+        #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
+        ax.text(13, -2.5, 'Maerz/March')
+        ax.text(31, -2.5, 'April')
     
             
     for ax2 in axs2.reshape(-1):
