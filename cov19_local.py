@@ -206,6 +206,9 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
         val_DT : list
             list containing the calculated day-depending doubling times
+    
+        rates : list
+            list containing rates (mortality rate, recovery rate, still ill rate)
     '''
     import matplotlib.pyplot as plt
     import numpy as np
@@ -396,8 +399,12 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     #raise Exception('stop')
     
     
+    rates = {'death_rate': num_tod / num * 100, 
+             'recover_rate': num_gesund / num * 100, 
+             'ill_rate': (num - num_gesund - num_tod) / num * 100,
+              'day': day}
     
-    return [name, day[7:], DTs, Ntot_today, Ntot_week]
+    return [name, day[7:], DTs, Ntot_today, Ntot_week, rates]
 
 #####################################
 # Doubeling Time (Verdopplungszeit) #
@@ -422,6 +429,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
         val_DT : list
             list containing the calculated day-depending doubling times
+    
+        rates : list
+            list containing rates (mortality rate, recovery rate, still ill rate)
+    
     
     state : list
             output from load_RKI
@@ -484,6 +495,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     fig, axs = plt.subplots(nrow, ncol, figsize=(28,21))
     fig2, axs2 = plt.subplots(nrow, ncol, figsize=(28,21))
+    fig3, axs3 = plt.subplots(nrow, ncol, figsize=(28,21))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.1, hspace=0.1)
     axs[0,0].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
     axs[0,1].set_title('Evolution of the Doubeling Time for German Counties')
@@ -523,61 +535,73 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         if i in range(0, 8): 
             ax = axs[0,0]
             ax2 = axs2[0,0]
+            ax3 = axs3[0,0]
             line_col = 20 + 30 * (8 - i)
 
         if i in range(8, 16): 
             ax = axs[0,1]
             ax2 = axs2[0,1]
+            ax3 = axs3[0,1]
             line_col = 20 + 30 * (16 - i)
 
         if i in range(16,24): 
             ax = axs[0,2]
             ax2 = axs2[0,2]
+            ax3 = axs3[0,2]
             line_col = 20 + 30 * (24 - i)
 
         if i in range(24,32): 
             ax = axs[0,3]
             ax2 = axs2[0,3]
+            ax3 = axs3[0,3]
             line_col = 20 + 30 * (32 - i)
 
         if i in range(32,40): 
             ax = axs[1,0]
             ax2 = axs2[1,0]
+            ax3 = axs3[1,0]
             line_col = 20 + 30 * (40 - i)
 
         if i in range(40,48): 
             ax = axs[1,1]
             ax2 = axs2[1,1]
+            ax3 = axs3[1,1]
             line_col = 20 + 30 * (48 - i)
 
         if i in range(48,56): 
             ax = axs[1,2]
             ax2 = axs2[1,2]
+            ax3 = axs3[1,2]
             line_col = 20 + 30 * (56 - i)
 
         if i in range(56,64): 
             ax = axs[1,3]
             ax2 = axs2[1,3]
+            ax3 = axs3[1,3]
             line_col = 20 + 30 * (64 - i)
 
         if i in range(64,72): 
             ax = axs[2,0]
             ax2 = axs2[2,0]
+            ax3 = axs3[2,0]
             line_col = 20 + 30 * (72 - i)
 
         if i in range(72,80): 
             ax = axs[2,1]
             ax2 = axs2[2,1]
+            ax3 = axs3[2,1]
             line_col = 20 + 30 * (80 - i)
 
         if i in range(80,88): 
             ax = axs[2,2]
             ax2 = axs2[2,2]
+            ax3 = axs3[2,2]
             line_col = 20 + 30 * (88 - i)
 
         if i in range(88,96): 
             ax = axs[2,3]
             ax2 = axs2[2,3]
+            ax3 = axs3[2,3]
             line_col = 20 + 30 * (96 - i)
             
         key = sorted_keys[i]
@@ -591,6 +615,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax2.loglog(DT[key][3], DT[key][4], '.-', c = cmap(line_col), label=DT[key][0])
         print DT[key][2][-1], int(DT[key][1][-1]), DT[key][0]
         
+        ax3.plot(DT[key][5]['day'], DT[key][5]['death_rate'], '*-', c = cmap(line_col), label=DT[key][0])
+        #ax3.plot(DT[key][5]['day'], DT[key][5]['recover_rate'], 'o-', c = cmap(line_col), label=DT[key][0])
+        #ax3.plot(DT[key][5]['day'], DT[key][5]['ill_rate'], 'x-', c = cmap(line_col), label=DT[key][0])
+        
     
     ######
     # axis
@@ -599,6 +627,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     axs[2,3].text(27, -4.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs[2,3].text(27, -5.6, 'Data: NPGEO-DE', fontsize=8)
     
+    link = axs3[2,3].text(27, -7, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs3[2,3].text(27, -8, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs3[2,3].text(27, -9, 'Data: NPGEO-DE', fontsize=8)
+
     link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs2[2,3].text(35, 4.4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs2[2,3].text(35, 3.8, 'Data: NPGEO-DE', fontsize=8)
@@ -642,17 +674,26 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         if ax2 in [axs2[0,0], axs2[1,0], axs2[2,0]]:
             ax2.set_ylabel('Fallzahlen in der letzten Woche (number of new cases last week)')
         
+    for ax3 in axs3.reshape(-1):
+        ax3.set_ylim(0,20.9)
+        ax3.set_xlim(13,50)
+    
+        ax3.grid(True, which="both")
+        ax3.set_xticks(np.arange(14, 50, 2))
+        ax3.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+        ax3.set_ylabel('Sterberaten in %')
+        
+    
+        ax3.legend(loc='upper left')
+    
+        #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
+        ax3.text(13, -6, 'Maerz/March')
+        ax3.text(31, -6, 'April')
         
     
     
     #plt.show()
     fig.savefig('DT_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
     fig2.savefig('loglog_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
-    
-    #################
-    #plt.title(name)
-    
-    for i in range(len(sorted_keys)):
-        plt.loglog()
-    
+    fig3.savefig('rate_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')    
     
