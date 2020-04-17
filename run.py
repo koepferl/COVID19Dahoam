@@ -26,7 +26,7 @@ for lkid in LK_ID:
     if True:#if lkid == '09162': # ## to check only one county - nur fuer einen Landkreis
         
         # load from specific csv file
-        num, day, month, name, LK_ids, state = load_RKI('data_RKI/RKI_COVID19_Bayern_2020-04-15.csv', lkid, state_name='Bavaria')
+        num, day, month, name, LK_ids, state = load_RKI('data_RKI/RKI_COVID19_Bayern_2020-04-17.csv', lkid, state_name='Bavaria')
         #print 'fall  ', num['fall']
         #print 'tod   ', num['tod']
         #print 'gesund', num['gesund']

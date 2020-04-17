@@ -61,7 +61,7 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
         case_state_dat = daten_RKI['fall'][daten_RKI['datum'] == dat]
         #tod_state_dat = daten_RKI['tod'][daten_RKI['datum'] == dat]
         #gesund_state_dat = daten_RKI['gesund'][daten_RKI['datum'] == dat]
-        case_state.append(np.sum(case_state_dat[case_state_dat > 0]))
+        case_state.append(np.sum(case_state_dat))#[case_state_dat > 0]))
     num_state = np.cumsum(np.array(case_state))
     
     # select unique region
@@ -125,14 +125,14 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
 
         fall_day = RKI_tab['fall'][cond]
         #print fall_day[fall_day < 0]
-        ufall[i] = np.sum(fall_day[fall_day > 0])
+        ufall[i] = np.sum(fall_day)#[fall_day > 0])
         
         tod_day = RKI_tab['tod'][cond]
-        utod[i] = np.sum(tod_day[tod_day > 0])
+        utod[i] = np.sum(tod_day)#[tod_day > 0])
         #print tod_day[tod_day < 0]
         
         gesund_day = RKI_tab['gesund'][cond]
-        ugesund[i] = np.sum(gesund_day[gesund_day > 0])
+        ugesund[i] = np.sum(gesund_day)#[gesund_day > 0])
         #print gesund_day[gesund_day < 0]
         
         uday[i] = RKI_tab['day'][cond][0]
