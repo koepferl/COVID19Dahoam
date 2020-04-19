@@ -224,7 +224,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     fig, ax = plt.subplots(figsize=(10,8))
     plt.title(name + ' (#' + ID +')')
-    ax.axis([13, 50, 0.9, 1e5])
+    ax.axis([13, 60, 0.9, 1e5])
     
     ####
     # move to March time frame
@@ -242,7 +242,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         #return a * b**(c*x)
         return np.log(a) + b * x  #log-linear
     
-    x = np.arange(10,50,0.5)
+    x = np.arange(10,60,0.5)
     
     # fit only when there are more than 6 data points and cases every day.
     data_points = range(8, len(day)+1)
@@ -253,7 +253,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     col = 30
     colapp = []
-    print 'Tag  DTs'
+    print 'Tag  DTs  R4'
     for cut in data_points:
         #print day[cut-8:cut]
         #print num[cut-8:cut]
@@ -273,6 +273,17 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         Ntot_today.append(num[cut-8:cut][-1])
         Ntot_week.append(num_week[-1] - num_week[0])
         
+        ########
+        # Reproduction number for Rtime notification days
+        #print num[cut-8:cut]
+        if cut-9 < 0:
+            num_before_int = num[cut-8:cut][0]
+        else: num_before_int = num[cut-8] - num[cut-9]
+        num_diff_8 = np.append(num_before_int, np.diff(num[cut-8:cut]))
+        #print num_diff_8
+        
+        R4 = np.sum(num_diff_8[4:]) / np.sum(num_diff_8[0:4])
+        #print num_diff_8[0:4], num_diff_8[4:]
         #########
         # doubling time
         #########
@@ -281,7 +292,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         DTs.append(DT)
         #print popt, np.log(2) / popt[1]
 
-        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT
+        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT, '%5.2f'%R4
 
         #print("a =", popt[0], "+/-", pcov[0,0]**0.5)
         #print("b =", popt[1], "+/-", pcov[1,1]**0.5)
@@ -362,16 +373,16 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     for axis in [ax.xaxis, ax.yaxis]:
         axis.set_major_formatter(ScalarFormatter())
     ax.grid(True, which="both")
-    plt.xticks(np.arange(14, 50, 2))
-    ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+    plt.xticks(np.arange(14, 60, 2))
+    ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
     
-    tx1 = ax.text(13, 0.5, 'Maerz')
-    tx2 = ax.text(31, 0.5, 'April')
+    tx1 = ax.text(13, 0.4, 'Maerz')
+    tx2 = ax.text(31, 0.4, 'April')
     
-    ax.text(54.5, 9e4, 'Christine Greif', fontsize=8)
-    link = ax.text(54.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax.text(54.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax.text(54.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
+    ax.text(64.5, 9e4, 'Christine Greif', fontsize=8)
+    link = ax.text(64.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
+    ax.text(64.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    ax.text(64.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
     ax.set_ylabel('Fallzahlen')
     lgd = ax.legend(loc='best', bbox_to_anchor=(1.12, 0.93))
@@ -475,7 +486,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         #return a * b**(c*x)
         return np.log(a) + b * x
     
-    x = np.arange(10,50,0.5)
+    x = np.arange(10,60,0.5)
     
     # fit only when there are more than 8 data points and cases every day.
     data_points = range(8, len(state_day)+1)
@@ -623,9 +634,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     ######
     # axis
     
-    link = axs[2,3].text(27, -3.6, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(27, -4.6, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(27, -5.6, 'Data: NPGEO-DE', fontsize=8)
+    link = axs[2,3].text(27, -7.2, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs[2,3].text(27, -9.2, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs[2,3].text(27, -11.2, 'Data: NPGEO-DE', fontsize=8)
     
     link = axs3[2,3].text(27, -7, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs3[2,3].text(27, -8, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
@@ -644,18 +655,18 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(0,30.9)
-        ax.set_xlim(13,50)
+        ax.set_ylim(0,60.9)
+        ax.set_xlim(13,60)
     
         ax.grid(True, which="both")
-        ax.set_xticks(np.arange(14, 50, 2))
-        ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+        ax.set_xticks(np.arange(14, 60, 2))
+        ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
     
         ax.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax.text(13, -2.5, 'Maerz/March')
-        ax.text(31, -2.5, 'April')
+        ax.text(13, -5, 'Maerz/March')
+        ax.text(31, -5, 'April')
     
             
     for ax2 in axs2.reshape(-1):
@@ -676,11 +687,11 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         
     for ax3 in axs3.reshape(-1):
         ax3.set_ylim(0,20.9)
-        ax3.set_xlim(13,50)
+        ax3.set_xlim(13,60)
     
         ax3.grid(True, which="both")
-        ax3.set_xticks(np.arange(14, 50, 2))
-        ax3.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+        ax3.set_xticks(np.arange(14, 60, 2))
+        ax3.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
         ax3.set_ylabel('Sterberaten in %')
         
     
@@ -696,4 +707,53 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     fig.savefig('DT_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
     fig2.savefig('loglog_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
     fig3.savefig('rate_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')    
+
+def docu(LK_ID, DT):
+    print '*' * 30
+    print 'English Documentation'
+    print '*' * 30
+
+    day_print = []
+    DT_print = []
+    name_print = []
+    for lkid in LK_ID:
+        #print DT[lkid]
+        #print DT[lkid][2]
+        DT_print.append(DT[lkid][2][-1])
+        day_print.append(DT[lkid][1][-1])
+        name_print.append(DT[lkid][0])
+
+    # sort
+    asort = np.argsort(DT_print)
+    DT_print = np.array(DT_print)[asort]
+    day_print = np.array(day_print)[asort]
+    name_print = np.array(name_print)[asort]   
+
+
+    for i in range(len(name_print)):
+        if i == 0:
+            #print '    * Bavaria average is ' + str(DT['Bavaria'][2][-1]) + 'd'
+            print '    * 5 counties with lowest DTS (the larger the better):'
     
+        if i == len(name_print) - 6: 
+            print '    * 5 counties with highest DTs (the larger the better):'
+
+        if (i < 5) or (i > len(name_print) - 6) :   
+            print '        *', '%5.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+
+
+    print '*' * 30
+    print 'German Documentation'
+    print '*' * 30
+
+    for i in range(len(name_print)):
+        if i == 0:
+            #print '    * Bayerischer Durchschnitt mit ' + str(DT['Bavaria'][2][-1]) + 'd'
+            print '    * 5 Kreise mit den niedriger Verdopplungszeiten (umso groesser desto besser):'
+    
+        if i == len(name_print) - 6: 
+            print '    * 5 Kreise mit den hoechsten Verdopplungszeiten (umso groesser desto besser):'
+
+        if (i < 5) or (i > len(name_print) - 6) :   
+            print '        *', '%5.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+        
