@@ -250,6 +250,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     DTs = []
     Ntot_today = []
     Ntot_week = []
+    R4s = []
     
     col = 30
     colapp = []
@@ -283,6 +284,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         #print num_diff_8
         
         R4 = np.sum(num_diff_8[4:]) / np.sum(num_diff_8[0:4])
+        R4s.append(R4)
         #print num_diff_8[0:4], num_diff_8[4:]
         #########
         # doubling time
@@ -415,7 +417,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
              'ill_rate': (num - num_gesund - num_tod) / num * 100,
               'day': day}
     
-    return [name, day[7:], DTs, Ntot_today, Ntot_week, rates]
+    return [name, day[7:], DTs, Ntot_today, Ntot_week, rates, R4s]
 
 #####################################
 # Doubeling Time (Verdopplungszeit) #
@@ -507,6 +509,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     fig, axs = plt.subplots(nrow, ncol, figsize=(28,21))
     fig2, axs2 = plt.subplots(nrow, ncol, figsize=(28,21))
     fig3, axs3 = plt.subplots(nrow, ncol, figsize=(28,21))
+    fig4, axs4 = plt.subplots(nrow, ncol, figsize=(28,21))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.1, hspace=0.1)
     axs[0,0].set_title('Entwicklung der Verdopplungszeiten auf Kreisebene')
     axs[0,1].set_title('Evolution of the Doubeling Time for German Counties')
@@ -547,72 +550,84 @@ def plot_DT(DT, state, ncol=4, nrow=3):
             ax = axs[0,0]
             ax2 = axs2[0,0]
             ax3 = axs3[0,0]
+            ax4 = axs4[0,0]
             line_col = 20 + 30 * (8 - i)
 
         if i in range(8, 16): 
             ax = axs[0,1]
             ax2 = axs2[0,1]
             ax3 = axs3[0,1]
+            ax4 = axs4[0,1]
             line_col = 20 + 30 * (16 - i)
 
         if i in range(16,24): 
             ax = axs[0,2]
             ax2 = axs2[0,2]
             ax3 = axs3[0,2]
+            ax4 = axs4[0,2]
             line_col = 20 + 30 * (24 - i)
 
         if i in range(24,32): 
             ax = axs[0,3]
             ax2 = axs2[0,3]
             ax3 = axs3[0,3]
+            ax4 = axs4[0,3]
             line_col = 20 + 30 * (32 - i)
 
         if i in range(32,40): 
             ax = axs[1,0]
             ax2 = axs2[1,0]
             ax3 = axs3[1,0]
+            ax4 = axs4[1,0]
             line_col = 20 + 30 * (40 - i)
 
         if i in range(40,48): 
             ax = axs[1,1]
             ax2 = axs2[1,1]
             ax3 = axs3[1,1]
+            ax4 = axs4[1,1]
             line_col = 20 + 30 * (48 - i)
 
         if i in range(48,56): 
             ax = axs[1,2]
             ax2 = axs2[1,2]
             ax3 = axs3[1,2]
+            ax4 = axs4[1,2]
             line_col = 20 + 30 * (56 - i)
 
         if i in range(56,64): 
             ax = axs[1,3]
             ax2 = axs2[1,3]
             ax3 = axs3[1,3]
+            ax4 = axs4[1,3]
             line_col = 20 + 30 * (64 - i)
 
         if i in range(64,72): 
             ax = axs[2,0]
             ax2 = axs2[2,0]
             ax3 = axs3[2,0]
+            ax4 = axs4[2,0]
             line_col = 20 + 30 * (72 - i)
 
         if i in range(72,80): 
             ax = axs[2,1]
             ax2 = axs2[2,1]
             ax3 = axs3[2,1]
+            ax4 = axs4[2,1]
             line_col = 20 + 30 * (80 - i)
 
         if i in range(80,88): 
             ax = axs[2,2]
             ax2 = axs2[2,2]
             ax3 = axs3[2,2]
+            ax4 = axs4[2,2]
             line_col = 20 + 30 * (88 - i)
 
         if i in range(88,96): 
             ax = axs[2,3]
             ax2 = axs2[2,3]
             ax3 = axs3[2,3]
+            ax4 = axs4[2,3]
             line_col = 20 + 30 * (96 - i)
             
         key = sorted_keys[i]
@@ -627,6 +642,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         print DT[key][2][-1], int(DT[key][1][-1]), DT[key][0]
         
         ax3.plot(DT[key][5]['day'], DT[key][5]['death_rate'], '*-', c = cmap(line_col), label=DT[key][0])
+        ax4.plot(DT[key][1], DT[key][6], '.-', c = cmap(line_col), label=DT[key][0])
         #ax3.plot(DT[key][5]['day'], DT[key][5]['recover_rate'], 'o-', c = cmap(line_col), label=DT[key][0])
         #ax3.plot(DT[key][5]['day'], DT[key][5]['ill_rate'], 'x-', c = cmap(line_col), label=DT[key][0])
         
@@ -641,6 +657,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     link = axs3[2,3].text(27, -7, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs3[2,3].text(27, -8, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs3[2,3].text(27, -9, 'Data: NPGEO-DE', fontsize=8)
+
+    link = axs4[2,3].text(27, -1., 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs4[2,3].text(27, -1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs4[2,3].text(27, -2., 'Data: NPGEO-DE', fontsize=8)
 
     link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs2[2,3].text(35, 4.4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
@@ -692,7 +712,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax3.grid(True, which="both")
         ax3.set_xticks(np.arange(14, 60, 2))
         ax3.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
-        ax3.set_ylabel('Sterberaten in %')
+        if ax3 in [axs3[0,0], axs3[1,0], axs3[2,0]]:
+            ax3.set_ylabel('Sterberaten in %')
         
     
         ax3.legend(loc='upper left')
@@ -702,11 +723,29 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax3.text(31, -6, 'April')
         
     
+    for ax4 in axs4.reshape(-1):
+        ax4.set_ylim(0,4.9)
+        ax4.set_xlim(13,60)
+    
+        ax4.grid(True, which="both")
+        ax4.set_xticks(np.arange(14, 60, 2))
+        ax4.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
+    
+        ax4.legend(loc='upper left')
+    
+        #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
+        ax4.text(13, -0.5, 'Maerz/March')
+        ax4.text(31, -0.5, 'April')
+        
+        if ax4 in [axs4[1,0]]:
+            ax4.set_ylabel('geschaetzte Reproduktionszahl R (Anzahl letzten 4 Meldungen / Anzahl der letzten 4 Meldungen davor)')
+        
     
     #plt.show()
     fig.savefig('DT_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
     fig2.savefig('loglog_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')
     fig3.savefig('rate_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')    
+    fig4.savefig('R_' + state[2] + '.pdf', dpi=300, overwrite=True, bbox_inches='tight')    
 
 def docu(LK_ID, DT):
     print '*' * 30
