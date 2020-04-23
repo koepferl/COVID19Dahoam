@@ -275,8 +275,24 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         Ntot_week.append(num_week[-1] - num_week[0])
         
         ########
+        # Reproduction number for Rtime notification days (4 days strict)
+        
+        #%%%%%%%%#daytoday = int(day[cut-1])
+        #%%%%%%%%#dayminus4 = int(daytoday - 5)
+        #%%%%%%%%#dayminus8 = int(daytoday - 9)
+        #%%%%%%%%#print daytoday, dayminus4, dayminus8
+        #%%%%%%%%#
+        #%%%%%%%%#print num[day == daytoday], num[day == dayminus4], num[day == dayminus8]
+        #%%%%%%%%#
+        #%%%%%%%%#R4_row = (num[day == daytoday] - num[day == dayminus4]) / (num[day == dayminus4] - num[day == dayminus8])
+        #%%%%%%%%#print R4_row
+        #%%%%%%%%#
+        #%%%%%%%%#raise Exception('stop')
+        
+        ########
         # Reproduction number for Rtime notification days
         #print num[cut-8:cut]
+        
         if cut-9 < 0:
             num_before_int = num[cut-8:cut][0]
         else: num_before_int = num[cut-8] - num[cut-9]
@@ -294,7 +310,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         DTs.append(DT)
         #print popt, np.log(2) / popt[1]
 
-        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%5.2f'%DT, '%5.2f'%R4
+        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%6.2f'%DT, '%6.2f'%R4
 
         #print("a =", popt[0], "+/-", pcov[0,0]**0.5)
         #print("b =", popt[1], "+/-", pcov[1,1]**0.5)
@@ -308,7 +324,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         ########
         # plot fit
         #########
-        day_label = 'Fit am ' + '%02d'%int(day_real[cut-1]) + '.' + '%02d'%int(month[cut-1]) + '; VZ: ' + '%5.2f'%DT + ' d'
+        day_label = 'Fit am ' + '%02d'%int(day_real[cut-1]) + '.' + '%02d'%int(month[cut-1]) + '; VZ: ' + '%6.2f'%DT + ' d'
         plt.semilogy(x, np.exp(func(x, *popt)), '-', color=plt.cm.viridis(int(col)), 
                      label=day_label)
         
@@ -778,7 +794,7 @@ def docu(LK_ID, DT):
             print '    * 5 counties with highest DTs (the larger the better):'
 
         if (i < 5) or (i > len(name_print) - 6) :   
-            print '        *', '%5.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+            print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
 
 
     print '*' * 30
@@ -794,5 +810,5 @@ def docu(LK_ID, DT):
             print '    * 5 Kreise mit den hoechsten Verdopplungszeiten (umso groesser desto besser):'
 
         if (i < 5) or (i > len(name_print) - 6) :   
-            print '        *', '%5.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+            print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
         
