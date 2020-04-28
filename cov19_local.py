@@ -47,7 +47,7 @@ def load_RKI(filename, LandkreisID, state_name ='Bavaria'):
     daten_RKI = np.loadtxt(filename, 
                            skiprows=1, 
                            delimiter=',', 
-                           usecols=(9,2,8,5,6,-1),
+                           usecols=(9,2,8,5,6,-3),
                            dtype={'names': ('lkID', 'lk_name', 'datum', 'fall', 'tod', 'gesund'), 'formats': ( 'S6', 'S40', 'S10', 'i4', 'i4', 'i4')})
     
     
@@ -209,6 +209,9 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
         rates : list
             list containing rates (mortality rate, recovery rate, still ill rate)
+    
+        pass_all : dict
+            dictionary of daily values of new cases, deaths and recovered cases
     '''
     import matplotlib.pyplot as plt
     import numpy as np
@@ -222,9 +225,20 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     num_tod = num_dic['tod']
     num_gesund = num_dic['gesund']
     
-    fig, ax = plt.subplots(figsize=(10,8))
-    plt.title(name + ' (#' + ID +')')
-    ax.axis([13, 60, 0.9, 1e5])
+    
+    fig, ax = plt.subplots(4, figsize=(10,22), gridspec_kw={'height_ratios': [3, 1, 1, 1]})
+            
+    ax[0].set_title(name + ' (#' + ID +')')
+    ax[0].axis([13, 60, 0.9, 1e5])
+    
+    ax[0].set_title('Abb. 1', loc='right', fontsize=8)
+    ax[1].axis([13, 60, 0.8, 1e3])
+    ax[1].set_title('Abb. 2', loc='right', fontsize=8)
+    ax[2].set_xlim([13, 60])
+    ax[2].set_title('Abb. 3', loc='right', fontsize=8)
+    ax[3].set_xlim([13, 60])
+    ax[3].set_title('Abb. 4', loc='right', fontsize=8)
+    
     
     ####
     # move to March time frame
@@ -302,6 +316,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         R4 = np.sum(num_diff_8[4:]) / np.sum(num_diff_8[0:4])
         R4s.append(R4)
         #print num_diff_8[0:4], num_diff_8[4:]
+        
         #########
         # doubling time
         #########
@@ -310,7 +325,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         DTs.append(DT)
         #print popt, np.log(2) / popt[1]
 
-        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%6.2f'%DT, '%6.2f'%R4
+        print '%02d'%int(day_real[cut-1]) + '.' +  '%02d'%int(month[cut-1]), '%6.2f'%DT#, '%6.2f'%R4
 
         #print("a =", popt[0], "+/-", pcov[0,0]**0.5)
         #print("b =", popt[1], "+/-", pcov[1,1]**0.5)
@@ -325,7 +340,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         # plot fit
         #########
         day_label = 'Fit am ' + '%02d'%int(day_real[cut-1]) + '.' + '%02d'%int(month[cut-1]) + '; VZ: ' + '%6.2f'%DT + ' d'
-        plt.semilogy(x, np.exp(func(x, *popt)), '-', color=plt.cm.viridis(int(col)), 
+        ax[0].semilogy(x, np.exp(func(x, *popt)), '-', color=plt.cm.viridis(int(col)), 
                      label=day_label)
         
         colapp.append(int(col))
@@ -339,23 +354,23 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
             # Beatmungsampel
             bedarf =  anteil_beatmung * np.exp(func(x, *popt))
             
-            plt.semilogy(x, bedarf, 
+            ax[0].semilogy(x, bedarf, 
                          '-', lw=3, color=plt.cm.Reds(200), 
                          label='Ampel (Beatmungsbedarf ca. ' + str(int(anteil_beatmung*100)) + '%)')
-            plt.semilogy(x[(bedarf < geraet_max)],bedarf[(bedarf < geraet_max)], 
+            ax[0].semilogy(x[(bedarf < geraet_max)],bedarf[(bedarf < geraet_max)], 
                          '-', lw=3, color=plt.cm.jet(180), 
                          label='Ampel (Beatmungsbedarf ca. ' + str(int(anteil_beatmung*100)) + '%)')
-            plt.semilogy(x[bedarf < geraet_min],bedarf[bedarf < geraet_min], 
+            ax[0].semilogy(x[bedarf < geraet_min],bedarf[bedarf < geraet_min], 
                          '-', lw=3, color=plt.cm.Greens(200), 
                          label='Ampel (Beatmungsbedarf ca. ' + str(int(anteil_beatmung*100)) + '%)')
             
             # Fehler
-            plt.semilogy(x, 0.05*np.exp(func(x, 
+            ax[0].semilogy(x, 0.05*np.exp(func(x, 
                                  popt[0] - pcov[0,0]**0.5, 
                                  popt[1] - pcov[1,1]**0.5)), 
                                  #popt[2] - pcov[2,2]**0.5), 
                          '--', color='k', alpha=0.5, label='Unsicherheiten')
-            plt.semilogy(x, 0.05*np.exp(func(x, 
+            ax[0].semilogy(x, 0.05*np.exp(func(x, 
                                  popt[0] + pcov[0,0]**0.5, 
                                  popt[1] + pcov[1,1]**0.5)), 
                                  #popt[2] + pcov[2,2]**0.5), 
@@ -366,15 +381,15 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ####
     # Beatmungs Kapazitaet
     #########
-    plt.plot([x[0], x[-1]], [geraet_min]*2, 'k:', label="Kapazitaet Beatmungsapparate")
-    plt.plot([x[0], x[-1]], [geraet_max]*2, 'k:')
+    ax[0].plot([x[0], x[-1]], [geraet_min]*2, 'k:', label="Kapazitaet Beatmungsapparate")
+    ax[0].plot([x[0], x[-1]], [geraet_max]*2, 'k:')
     
     ####
     # gemeldete Fallzahlen
     #########
-    plt.semilogy(day, num, 'k+', label="COVID19 erkrankt")
-    plt.semilogy(day, num_tod, 'k*', label="davon verstorben")
-    plt.semilogy(day, num_gesund, 'ko', alpha=0.3, label="davon genesen")
+    ax[0].semilogy(day, num, 'k+', label="COVID19 erkrankt")
+    ax[0].semilogy(day, num_tod, 'k*', label="davon verstorben")
+    ax[0].semilogy(day, num_gesund, 'ko', alpha=0.3, label="davon genesen")
     
     print '+' * 30
     print 'Sterberate (%): ', np.round(num_tod[-1] / num[-1] * 100, 2)
@@ -388,31 +403,38 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     #############
     
     from matplotlib.ticker import ScalarFormatter
-    for axis in [ax.xaxis, ax.yaxis]:
+    for axis in [ax[0].xaxis, ax[0].yaxis]:
         axis.set_major_formatter(ScalarFormatter())
-    ax.grid(True, which="both")
-    plt.xticks(np.arange(14, 60, 2))
-    ax.set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
     
-    tx1 = ax.text(13, 0.4, 'Maerz')
-    tx2 = ax.text(31, 0.4, 'April')
+    ax[0].grid(True, which="both")
+    ax[0].set_xticks(np.arange(14, 60, 2))
+    ax[0].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
     
-    ax.text(64.5, 9e4, 'Christine Greif', fontsize=8)
-    link = ax.text(64.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax.text(64.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax.text(64.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
+    ax[0].text(13, 0.4, 'Maerz')
+    ax[0].text(31, 0.4, 'April')
+    ax[0].annotate('Ausgangssperre', ha='center', xy=(21, ax[0].get_ylim()[0]), xytext=(21, 0.4), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[0].annotate('Ostern', ha='center', xy=(31+12, ax[0].get_ylim()[0]), xytext=(31+12, 0.4), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[0].annotate('Ende Ferien', ha='center', xy=(31+20, ax[0].get_ylim()[0]), xytext=(31+20, 0.4), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    
+    ax[0].text(64.5, 9e4, 'Christine Greif', fontsize=8)
+    link = ax[0].text(64.5, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
+    ax[0].text(64.5, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    ax[0].text(64.5, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
-    ax.set_ylabel('Fallzahlen')
-    lgd = ax.legend(loc='best', bbox_to_anchor=(1.12, 0.93))
+    ax[0].set_ylabel('Gesamte Fallzahlen')
+    lgd = ax[0].legend(loc='best', bbox_to_anchor=(1.12, 0.93))
     
     # percent
     #########
     EW_county = get_people_of_county(asked_ID=ID)
     
-    axi = ax.twinx()
+    axi = ax[0].twinx()
     
     #print 'lim', ax.get_ylim(), ax.get_ylim()[0] / EW_county * 100, ax.get_ylim()[1] / EW_county * 100, EW_county
-    axi.set_ylim(ax.get_ylim()[0] / EW_county * 100 , ax.get_ylim()[1] / EW_county * 100 )
+    axi.set_ylim(ax[0].get_ylim()[0] / EW_county * 100 , ax[0].get_ylim()[1] / EW_county * 100 )
     axi.set_yscale('log')
     import matplotlib.ticker as mtick
     import matplotlib.ticker as ticker
@@ -422,18 +444,187 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     #axi.yaxis.set_major_formatter(mtick.PercentFormatter())
     axi.set_ylabel('Prozentualer Anteil zur Gesamteinwohnerzahl (' + str(EW_county) + ') im Kreis')
     
-    fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, 
-                bbox_extra_artists=(lgd, tx1, tx2,), bbox_inches='tight')
-                
-    #raise Exception('stop')
+    ###########
+    # plot 2
+    ###########
+    pass_all = {'day': day, 'fall': np.append(num[0], np.diff(num)), 'gesund': np.append(num_gesund[0], np.diff(num_gesund)), 'tod': np.append(num_tod[0], np.diff(num_tod))}
+    
+    ax[1].set_ylabel('Taeglich gemeldete Fallzahlen')
+    ax[1].semilogy(day, pass_all['fall'], color='None', label=None)
+    ax[1].semilogy(day, pass_all['tod'], color='None', label=None)
+    ax[1].semilogy(day, pass_all['gesund'], color='None', alpha=0.3, label=None)
+    
+    # box
+    import matplotlib.patches as patches
+    for b in range(len(day)):
+        if b == 0:
+            label_fall = "neu erkrankt"
+            label_gesund = 'neu genesen'
+            label_tod = 'neu verstorben'
+        else:
+            label_fall = None
+            label_gesund = None
+            label_tod = None
+        
+        
+        ax[1].add_patch(patches.Rectangle((day[b]-0.45,0.),0.9,pass_all['fall'][b],
+                                          linewidth=1,edgecolor='k',facecolor=plt.cm.jet(180), label=label_fall))           
+        ax[1].add_patch(patches.Rectangle((day[b]-0.45,0.),0.9,pass_all['gesund'][b],
+        linewidth=1,edgecolor='k',facecolor='None', label=label_gesund, hatch='////'))        
+        ax[1].add_patch(patches.Rectangle((day[b]-0.45,0.),0.9,pass_all['tod'][b],
+        linewidth=1,edgecolor='k',facecolor='k', label=label_tod))
+    
+    #h = ax[1].hist(pass_all['fall'], bins=np.append(day - 0.5, day[-1] + 0.5))
+    #print h
+    #print pass_all['fall']
+    #ax[1].hist(pass_all['tod'], bins=day)
+    #ax[1].hist(pass_all['gesund'], bins=day)
+    
+    from matplotlib.ticker import ScalarFormatter
+    for axis in [ax[1].xaxis, ax[1].yaxis]:
+        axis.set_major_formatter(ScalarFormatter())
+    
+    ax[1].set_axisbelow(True)
+    ax[1].grid(True, which="both")
+    ax[1].set_xticks(np.arange(14, 60, 2))
+    ax[1].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
+    
+    tx1 = ax[1].text(13, 0.2, 'Maerz')
+    tx2 = ax[1].text(31, 0.2, 'April')
+    ax[1].annotate('Ausgangssperre', ha='center', xy=(21, ax[1].get_ylim()[0]), xytext=(21, 0.2), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[1].annotate('Ostern', ha='center', xy=(31+12, ax[1].get_ylim()[0]), xytext=(31+12, 0.2), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[1].annotate('Ende Ferien', ha='center', xy=(31+20, ax[1].get_ylim()[0]), xytext=(31+20, 0.2), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+        
+    ax[1].legend(loc='best')
+    
+    ###########
+    # plot 3
+    ###########
+    ax[2].set_ylabel('Verdopplungszeiten in Tage')
+    ax[2].plot(ax[2].get_xlim(), [10,10], ':', lw =2, color='grey', label='VZ = 10') 
+    ax[2].plot(day[7:], np.array(DTs), 'k.-') 
+    
+    #from scipy.signal import find_peaks
+    #peaks, _ = find_peaks(np.array(DTs))
+    #print 'peaks', peaks
+    #ax[2].plot(peaks, np.array(DTs)[peaks], "Hb")
+    
+    #ax[2].plot(day[7:], np.gradient(DTs, day[7:]), 'ko-')
+    diff = np.diff(DTs)
+    ax[2].plot(day[7:][1:][diff < 0], np.array(DTs)[1:][diff < 0], '^', color=plt.cm.Reds(200), label='Achtung: VZ faellt (!!!)') 
+    #ax[2].plot(day[7:][1:], diff, 'k^-')
+    
+    #print 'gradient', gradient
+    #print 'diff', np.diff(DTs)
+    
+    ax[2].grid(True, which="both")
+    ax[2].set_xticks(np.arange(14, 60, 2))
+    ax[2].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
+    
+    ax[2].legend(loc='best')
+    offset = ax[2].get_ylim()[0] - (ax[2].get_ylim()[1] - ax[2].get_ylim()[0]) / 5.
+    tx1 = ax[2].text(13, offset, 'Maerz')
+    tx2 = ax[2].text(31, offset, 'April')
+    ax[2].annotate('Ausgangssperre', ha='center', xy=(21, ax[2].get_ylim()[0]), xytext=(21, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[2].annotate('Ostern', ha='center', xy=(31+12, ax[2].get_ylim()[0]), xytext=(31+12, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[2].annotate('Ende Ferien', ha='center', xy=(31+20, ax[2].get_ylim()[0]), xytext=(31+20, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    
+    ax[2].text(ax[2].get_xlim()[1] * 1.02, ax[2].get_ylim()[1] * 0.9, 'zu Abb. 1: \nBei Kreisen mit sehr kurzen Verdopplungszeiten \nwird der Verlauf nicht/kaum flacher; mit sehr langen \nVerdopplungszeiten (wenigen Neuerkrankten) \nist der Verlauf fast horizontal. \n(Ziel: horizontale Linie).')
+    
+    ax[2].text(ax[2].get_xlim()[1] * 1.02, ax[2].get_ylim()[1] * 0.5, 'zu Abb. 2: \nBalkendiagramm der taeglich gemeldeten Fallzahlen. \n(Ziel: keine gelben und schwarzen Balken.)')
+       
+    ax[2].text(ax[2].get_xlim()[1] * 1.02, ax[2].get_ylim()[0], 'zu Abb. 3: \nVerdopplungszahl gibt die Zeit an in der sich die \nFallzahlen verdoppeln. Verdopplungszeiten \nkleiner als 10 oder abnehmend sind bedenklich. \n(Ziel: keine verkuerzenden Verdopplungszeiten \nund viel groesser als 10).')
+    
+    ax[2].text(ax[2].get_xlim()[1] * 1.02, - ax[2].get_ylim()[1] * 0.5, 'zu Abb. 4: \nReproduktionszahl gibt die Anzahl der \nWeiteransteckungen durch einen Infizierten an. \nReproduktionszahl groesser als 1 ist bedenklich. \n(Ziel: Reproduktionszahl viel kleiner als 1).')
+    
+    ###########
+    # plot 4
+    ###########
+    
+    ########
+    # Reproduction number for Rtime notification days (4 days interpoliert)
+    
+    minus8 = np.interp(day-8-1, day, num)
+    minus4 = np.interp(day-4-1, day, num)
+    minus_all = np.interp(np.arange(day[0], day[-1]), day, num)
+    #print day - 8 - 1
+    #print day
+    #print num
+    #print day - 4 - 1
+    
+    #for i in range(len(np.arange(day[0], day[-1]))):
+    #    print np.arange(day[0], day[-1])[i], minus_all[i]
+    
+    R_number_interp = (num - minus4) / (minus4 - minus8)
+    R_number_interp[day-8-1 < day[0]] = np.nan # before 1st case
+    R_number_interp[day-4-1 < day[0]] = np.nan # before 1st case
     
     
+    #for da in day:
+    #    if da-4 < day[0]:
+    #        new_minus4 = 0
+    #    else: new_minus4 = np.interp(da-4, day, num)
+    #    if da-8 < day[0]:
+    #        new_minus8 = 0
+    #    else:
+    #        new_minus8 = np.interp(da-8, day, num)
+    
+    ax[3].set_ylabel('Interpolierte Reproduktionszahl')
+    
+    ax[3].plot(ax[3].get_xlim(), [1,1], ':', lw =2, color='grey', label='R = 1') 
+    ax[3].plot(day, R_number_interp, 'k.-') 
+    ax[3].plot(day[R_number_interp >= 1], R_number_interp[R_number_interp >= 1], '^', color=plt.cm.Reds(200), label='Achtung: R > 1 (!!!)') 
+    
+    ax[3].grid(True, which="both")
+    ax[3].set_xticks(np.arange(14, 60, 2))
+    ax[3].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27])
+    ax[3].legend(loc='best')
+    
+    offset = ax[3].get_ylim()[0] - (ax[3].get_ylim()[1] - ax[3].get_ylim()[0]) / 5.
+    tx1 = ax[3].text(13, offset, 'Maerz')
+    tx2 = ax[3].text(31, offset, 'April')
+    ax[3].annotate('Ausgangssperre', ha='center', xy=(21, ax[3].get_ylim()[0]), xytext=(21, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[3].annotate('Ostern', ha='center', xy=(31+12, ax[3].get_ylim()[0]), xytext=(31+12, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+    ax[3].annotate('Ende Ferien', ha='center', xy=(31+20, ax[3].get_ylim()[0]), xytext=(31+20, offset), 
+                    arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
+
+    
+    fig.savefig('expert/' + name + '_expert.pdf', dpi=300, overwrite=True, bbox_inches='tight', bbox_extra_artists=(lgd, tx1, tx2))
+    
+    
+    ##################
+    # save plot ax[0]
+    ##################
+    
+    ax[1].remove()
+    ax[2].remove()
+    ax[3].remove()
+    #for a in ax:
+    #    print 'ax'
+    #fig.set_size_inches(10, 8)
+    #ax[0].set_aspect(aspect=0.5)
+    #fig.set_gridspec_kw({'height_ratios': [1, 0, 0, ]})
+    #fig.gridspec_kw({'height_ratios': [1]})
+    
+    #extent = ax[0].get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    # Pad the saved area by 10% in the x-direction and 20% in the y-direction
+    fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, bbox_extra_artists=(lgd, tx1, tx2), bbox_inches='tight')
+                    
     rates = {'death_rate': num_tod / num * 100, 
              'recover_rate': num_gesund / num * 100, 
              'ill_rate': (num - num_gesund - num_tod) / num * 100,
               'day': day}
+              
     
-    return [name, day[7:], DTs, Ntot_today, Ntot_week, rates, R4s]
+    return [name, day[7:], DTs, Ntot_today, Ntot_week, rates, R4s, pass_all]
 
 #####################################
 # Doubeling Time (Verdopplungszeit) #
@@ -666,9 +857,11 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     ######
     # axis
     
-    link = axs[2,3].text(27, -7.2, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(27, -9.2, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(27, -11.2, 'Data: NPGEO-DE', fontsize=8)
+    factor_1 = 100/60.
+    
+    link = axs[2,3].text(27, -7.2 * factor_1, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs[2,3].text(27, -9.2 * factor_1, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs[2,3].text(27, -11.2 * factor_1, 'Data: NPGEO-DE', fontsize=8)
     
     link = axs3[2,3].text(27, -7, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs3[2,3].text(27, -8, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
@@ -677,10 +870,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     link = axs4[2,3].text(27, -1., 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
     axs4[2,3].text(27, -1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
     axs4[2,3].text(27, -2., 'Data: NPGEO-DE', fontsize=8)
-
-    link = axs2[2,3].text(35, 5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs2[2,3].text(35, 4.4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs2[2,3].text(35, 3.8, 'Data: NPGEO-DE', fontsize=8)
+    
+    link = axs2[2,3].text(3.5, 0.5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
+    axs2[2,3].text(3.5, 0.44, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
+    axs2[2,3].text(3.5, 0.38, 'Data: NPGEO-DE', fontsize=8)
     
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
@@ -691,7 +884,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(0,60.9)
+        ax.set_ylim(0,100.9)
         ax.set_xlim(13,60)
     
         ax.grid(True, which="both")
@@ -701,8 +894,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax.text(13, -5, 'Maerz/March')
-        ax.text(31, -5, 'April')
+        ax.text(13, -5 * factor_1, 'Maerz/March')
+        ax.text(31, -5 * factor_1, 'April')
     
             
     for ax2 in axs2.reshape(-1):
@@ -712,8 +905,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
             axis.set_major_formatter(ScalarFormatter())
         ax2.grid(True, which="both")
         
-        ax2.set_ylim(10.5,2000)
-        ax2.set_xlim(10.5,10000)
+        ax2.set_ylim(1.5,2000)
+        ax2.set_xlim(1.5,10000)
         ax2.legend(loc='upper left')
         
         if ax2 in [axs2[2,0], axs2[2,1], axs2[2,2], axs2[2,3]]:
