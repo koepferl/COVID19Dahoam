@@ -11,3 +11,4 @@ Here the diagrams for the 96 Bavarian counties (more coming) of the evolution of
      * German: see Documentation_COVID19_Local_German.ipynb, plots/LK Miesbach.pdf, DT.pdf
 * Credits: Christine Greif (see documentation for further information) 
 * Thanks to Prof. Andreas Burkert (LMU)
+* Note: This code grew very quickly and was originally not intended to go public. It is full of German phrases, as at the beginning I made this plots for may family. If you have questions contact me. 
