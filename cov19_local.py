@@ -249,6 +249,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     day[month == 2] = day[month == 2] - 29
     day[month == 1] = day[month == 1] - 29 - 31
     day[month == 4] = day[month == 4] + 31
+    day[month == 5] = day[month == 5] + 31 + 30
     
     #########
     # fit
@@ -422,12 +423,13 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[0].annotate('Ende Ferien', ha='center', xy=(31+20, ax[0].get_ylim()[0]), xytext=(31+20, 0.4), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     
+    # credit bar
+    credit = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE; VZ = Verdopplungszeit'
     loc_label = ax[0].get_xlim()[1] * 1.12
-    ax[0].text(loc_label, 9e4, 'Christine Greif', fontsize=8)
-    link = ax[0].text(loc_label, 7.4e4, 'http://www.usm.uni-muenchen.de/~koepferl', fontsize=8)
-    ax[0].text(loc_label, 5.9e4, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    ax[0].text(loc_label, 4.6e4, 'Data: NPGEO-DE; VZ = Verdopplungszeit ', fontsize=8)
+    link = ax[0].text(loc_label, 9e4, credit, fontsize=8, va='top')
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
+    
+    # label
     ax[0].set_ylabel('Gesamte Fallzahlen')
     lgd = ax[0].legend(loc='best', bbox_to_anchor=(1.12, 0.93))
     
@@ -454,9 +456,15 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     pass_all = {'day': day, 'fall': np.append(num[0], np.diff(num)), 'gesund': np.append(num_gesund[0], np.diff(num_gesund)), 'tod': np.append(num_tod[0], np.diff(num_tod))}
     
     ax[1].set_ylabel('Taeglich gemeldete Fallzahlen')
-    ax[1].semilogy(day, pass_all['fall'], color='None', label=None)
-    ax[1].semilogy(day, pass_all['tod'], color='None', label=None)
-    ax[1].semilogy(day, pass_all['gesund'], color='None', alpha=0.3, label=None)
+    
+    # gemittelt ueber 4 Tage
+    all_smooth = 0.25 * (pass_all['fall'][:-3] + pass_all['fall'][1:-2] + pass_all['fall'][2:-1] + pass_all['fall'][3:])
+    tod_smooth = 0.25 * (pass_all['tod'][:-3] + pass_all['tod'][1:-2] + pass_all['tod'][2:-1] + pass_all['tod'][3:])
+    gesund_smooth = 0.25 * (pass_all['gesund'][:-3] + pass_all['gesund'][1:-2] + pass_all['gesund'][2:-1] + pass_all['gesund'][3:])
+    
+    ax[1].semilogy(day[3:], all_smooth, 'r-', label='neu erkrankt (4-Tagesmittel)')
+    ax[1].semilogy(day[3:], tod_smooth, 'k-', label='neu verstorben (4-Tagesmittel)')
+    ax[1].semilogy(day[3:], gesund_smooth, 'k-', alpha=0.3, label='neu genesen (4-Tagesmittel)')
     
     # box
     import matplotlib.patches as patches
@@ -881,21 +889,12 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     factor_1 = 100/60.
     x_pos = 37
     
-    link = axs[2,3].text(x_pos, -7.2 * factor_1, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs[2,3].text(x_pos, -9.2 * factor_1, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs[2,3].text(x_pos, -11.2 * factor_1, 'Data: NPGEO-DE', fontsize=8)
+    credit2 = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE'
     
-    link = axs3[2,3].text(x_pos, -7, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs3[2,3].text(x_pos, -8, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs3[2,3].text(x_pos, -9, 'Data: NPGEO-DE', fontsize=8)
-
-    link = axs4[2,3].text(x_pos, -1., 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs4[2,3].text(x_pos, -1.5, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs4[2,3].text(x_pos, -2., 'Data: NPGEO-DE', fontsize=8)
-    
-    link = axs2[2,3].text(3.5, 0.5, 'Christine Greif (http://www.usm.uni-muenchen.de/~koepferl)', fontsize=8)
-    axs2[2,3].text(3.5, 0.44, 'This work is licensed under CC-BY-SA 4.0', fontsize=8)
-    axs2[2,3].text(3.5, 0.38, 'Data: NPGEO-DE', fontsize=8)
+    link = axs[2,3].text(x_pos, -10 * factor_1, credit2, fontsize=8, va = 'top')    
+    link = axs3[2,3].text(x_pos, -2, credit2, fontsize=8)
+    link = axs4[2,3].text(x_pos, -1., credit2, fontsize=8)
+    link = axs2[2,3].text(3.5, 0.5, credit2, fontsize=8, va='top')
     
     link.set_url('http://www.usm.uni-muenchen.de/~koepferl')
 
@@ -952,9 +951,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax3.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax3.text(13, -6, 'Maerz/March')
-        ax3.text(31, -6, 'April')
-        ax.text(31+30, -6, 'Mai/May')
+        offset3 = - 0.07 * ax3.get_ylim()[1]
+        ax3.text(13, offset3, 'Maerz/March')
+        ax3.text(31, offset3, 'April')
+        ax3.text(31+30, offset3, 'Mai/May')
         
     
     for ax4 in axs4.reshape(-1):
@@ -968,9 +968,10 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax4.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax4.text(13, -0.5, 'Maerz/March')
-        ax4.text(31, -0.5, 'April')
-        ax.text(31+30, -0.5, 'Mai/May')
+        offset4 = - 0.07 * ax4.get_ylim()[1]
+        ax4.text(13, offset4, 'Maerz/March')
+        ax4.text(31, offset4, 'April')
+        ax4.text(31+30, offset4, 'Mai/May')
         
         if ax4 in [axs4[1,0]]:
             ax4.set_ylabel('geschaetzte Reproduktionszahl R (Anzahl letzten 4 Meldungen / Anzahl der letzten 4 Meldungen davor)')
@@ -1013,8 +1014,10 @@ def docu(LK_ID, DT):
             print '    * 5 counties with highest DTs (the larger the better):'
 
         if (i < 5) or (i > len(name_print) - 6) :   
-            print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
-
+            if day_print[i]-31 <= 30: #April
+                print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+            if day_print[i]-31 > 30: #Mai
+                print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31 - 30)) + '.5', name_print[i]
 
     print '*' * 30
     print 'German Documentation'
@@ -1029,5 +1032,8 @@ def docu(LK_ID, DT):
             print '    * 5 Kreise mit den hoechsten Verdopplungszeiten (umso groesser desto besser):'
 
         if (i < 5) or (i > len(name_print) - 6) :   
-            print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+            if day_print[i]-31 <= 30: #April
+                print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31)) + '.4', name_print[i]
+            if day_print[i]-31 > 30: #Mai
+                print '        *', '%6.2f'%DT_print[i], str(int(day_print[i]-31 - 30)) + '.5', name_print[i]
         
