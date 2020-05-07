@@ -457,22 +457,39 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     ax[1].set_ylabel('Taeglich gemeldete Fallzahlen')
     
-    # gemittelt ueber 4 Tage
-    all_smooth = 0.25 * (pass_all['fall'][:-3] + pass_all['fall'][1:-2] + pass_all['fall'][2:-1] + pass_all['fall'][3:])
-    tod_smooth = 0.25 * (pass_all['tod'][:-3] + pass_all['tod'][1:-2] + pass_all['tod'][2:-1] + pass_all['tod'][3:])
-    gesund_smooth = 0.25 * (pass_all['gesund'][:-3] + pass_all['gesund'][1:-2] + pass_all['gesund'][2:-1] + pass_all['gesund'][3:])
+    # gemittelt ueber 7 Tage
+    all_smooth = np.zeros(shape = day[6:].shape)
+    tod_smooth = np.zeros(shape = day[6:].shape)
+    gesund_smooth = np.zeros(shape = day[6:].shape)
+
+    for z in range(7):
+        stop = -6+z
+        #print z, stop
+        if stop != 0:
+            all_smooth =  all_smooth + 1/7. * pass_all['fall'][z:stop]
+            tod_smooth = tod_smooth + 1/7. * pass_all['tod'][z:stop]
+            gesund_smooth = gesund_smooth + 1/7. * pass_all['gesund'][z:stop]
+        else:
+            all_smooth =  all_smooth + 1/7. * pass_all['fall'][z:]
+            tod_smooth = tod_smooth + 1/7. * pass_all['tod'][z:]
+            gesund_smooth = gesund_smooth + 1/7. * pass_all['gesund'][z:]
+            
+        
+    #all_smooth = 0.25 * (pass_all['fall'][0:-3] + pass_all['fall'][1:-2] + pass_all['fall'][2:-1] + pass_all['fall'][3:0])
+    #tod_smooth = 0.25 * (pass_all['tod'][0:-3] + pass_all['tod'][1:-2] + pass_all['tod'][2:-1] + pass_all['tod'][3:0])
+    #gesund_smooth = 0.25 * (pass_all['gesund'][0:-3] + pass_all['gesund'][1:-2] + pass_all['gesund'][2:-1] + pass_all['gesund'][3:0])
     
-    ax[1].semilogy(day[3:], all_smooth, 'r-', label='neu erkrankt (4-Tagesmittel)')
-    ax[1].semilogy(day[3:], tod_smooth, 'k-', label='neu verstorben (4-Tagesmittel)')
-    ax[1].semilogy(day[3:], gesund_smooth, 'k-', alpha=0.3, label='neu genesen (4-Tagesmittel)')
+    ax[1].semilogy(day[6:], all_smooth, 'r-', label='neu erkrankt (7-Tagesmittel)')
+    ax[1].semilogy(day[6:], tod_smooth, 'k-', label='verstorben (7-Tagesmittel)')
+    ax[1].semilogy(day[6:], gesund_smooth, 'k-', alpha=0.3, label='genesen (7-Tagesmittel)')
     
     # box
     import matplotlib.patches as patches
     for b in range(len(day)):
         if b == 0:
             label_fall = "neu erkrankt"
-            label_gesund = 'neu genesen'
-            label_tod = 'neu verstorben'
+            label_gesund = 'genesen'
+            label_tod = 'verstorben'
         else:
             label_fall = None
             label_gesund = None
@@ -484,7 +501,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         ax[1].add_patch(patches.Rectangle((day[b]-0.45,0.),0.9,pass_all['gesund'][b],
         linewidth=1,edgecolor='k',facecolor='None', label=label_gesund, hatch='////'))        
         ax[1].add_patch(patches.Rectangle((day[b]-0.45,0.),0.9,pass_all['tod'][b],
-        linewidth=1,edgecolor='k',facecolor='k', label=label_tod))
+        linewidth=1,edgecolor='k',facecolor='w', label=label_tod))
     
     #h = ax[1].hist(pass_all['fall'], bins=np.append(day - 0.5, day[-1] + 0.5))
     #print h
