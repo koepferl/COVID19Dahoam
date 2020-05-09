@@ -2,7 +2,7 @@ from cov19_local import load_RKI, plot_corona, plot_DT, docu
 
 import numpy as np
 
-date = '2020-05-07'
+date = '2020-05-09'
 
 # County ID for Bavaria - Landkreis ID fuer Bayern
 LK_ID = np.array(['09771', '09171', '09371', '09571', '09671', '09772', '09672',
@@ -25,14 +25,14 @@ DT = {}
 
 # loop over all counties - Ausfuehren fuer alle Landkreise
 for lkid in LK_ID:
-    if True:#if lkid == '09182':## # ## to check only one county - nur fuer einen Landkreis
+    if True:#lkid == '09273':#x'09182':## # ## to check only one county - nur fuer einen Landkreis
         
         # load from specific csv file
         num, day, month, name, LK_ids, state = load_RKI('data_RKI/RKI_COVID19_Bayern_' + date + '.csv', lkid, state_name='Bavaria')
         #print 'fall  ', num['fall']
         #print 'tod   ', num['tod']
         #print 'gesund', num['gesund']
-        
+        #print num, day
         # specify capacity of intensive care for the individual counties - Beatmungskapazitaet
 
         # Kapazitaet Beatmung Landkreis Miesbach

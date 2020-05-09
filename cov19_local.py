@@ -221,10 +221,12 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     print name
     print '-' * 30
     
-    num = num_dic['fall']
-    num_tod = num_dic['tod']
-    num_gesund = num_dic['gesund']
+    num = num_dic['fall'][num_dic['fall'] > 0]
+    num_tod = num_dic['tod'][num_dic['fall'] > 0]
+    num_gesund = num_dic['gesund'][num_dic['fall'] > 0]
     
+    day = day[num_dic['fall'] > 0]
+    month = month[num_dic['fall'] > 0]
     day_max = 80.
     
     
@@ -250,6 +252,9 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     day[month == 1] = day[month == 1] - 29 - 31
     day[month == 4] = day[month == 4] + 31
     day[month == 5] = day[month == 5] + 31 + 30
+    
+    #print 'day now', day
+    #print 'day_real', day_real
     
     #########
     # fit
@@ -379,6 +384,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
                                  #popt[2] + pcov[2,2]**0.5), 
                          '--', color='k', alpha=0.5)
     
+    #print 'day now2', day
     
     
     ####
@@ -393,6 +399,8 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[0].semilogy(day, num, 'k+', label="COVID19 erkrankt")
     ax[0].semilogy(day, num_tod, 'k*', label="davon verstorben")
     ax[0].semilogy(day, num_gesund, 'ko', alpha=0.3, label="davon genesen")
+    
+    #print 'day now3', day
     
     print '+' * 30
     print 'Sterberate (%): ', np.round(num_tod[-1] / num[-1] * 100, 2)
@@ -627,7 +635,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     ax[3].text(ax[3].get_xlim()[1] * 1.02, 
                ax[3].get_ylim()[1] * 0.75, 
-               'zu Abb. 2: \nBalkendiagramm der taeglich gemeldeten Fallzahlen. \n(Ziel: keine gelben und schwarzen Balken.)'
+               'zu Abb. 2: \nBalkendiagramm der taeglich gemeldeten Fallzahlen. \n(Ziel: keine gelben und weissen Balken.)'
                )
        
     ax[3].text(ax[3].get_xlim()[1] * 1.02,
@@ -885,12 +893,12 @@ def plot_DT(DT, state, ncol=4, nrow=3):
             
         key = sorted_keys[i]
         if i in [0, 8 ,16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96]:
-            ax.plot(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
+            ax.semilogy(state_day[7:], DTs_state, '.:k', label= state[2] + ' average')
             print '-' * 20
             print state[2], DTs_state[-1], int(state_day[7:][-1])
             print '-' * 20
         
-        ax.plot(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
+        ax.semilogy(DT[key][1], DT[key][2], '.-', c = cmap(line_col), label=DT[key][0])
         ax2.loglog(DT[key][3], DT[key][4], '.-', c = cmap(line_col), label=DT[key][0])
         print DT[key][2][-1], int(DT[key][1][-1]), DT[key][0]
         
@@ -903,12 +911,12 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     ######
     # axis
     
-    factor_1 = 100/60.
+    #factor_1 = 100/60.
     x_pos = 37
     
     credit2 = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE'
     
-    link = axs[2,3].text(x_pos, -10 * factor_1, credit2, fontsize=8, va = 'top')    
+    link = axs[2,3].text(x_pos, 0.1, credit2, fontsize=8, va = 'top')    
     link = axs3[2,3].text(x_pos, -2, credit2, fontsize=8)
     link = axs4[2,3].text(x_pos, -1., credit2, fontsize=8)
     link = axs2[2,3].text(3.5, 0.5, credit2, fontsize=8, va='top')
@@ -922,7 +930,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(0,100.9)
+        ax.set_ylim(1.,500.9)
         ax.set_xlim(13,day_max)
     
         ax.grid(True, which="both")
@@ -932,9 +940,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax.text(13, -5 * factor_1, 'Maerz/March')
-        ax.text(31, -5 * factor_1, 'April')
-        ax.text(31+30, -5 * factor_1, 'Mai/May')
+        ax.text(13, 0.5, 'Maerz/March')
+        ax.text(31, 0.5, 'April')
+        ax.text(31+30, 0.5, 'Mai/May')
     
             
     for ax2 in axs2.reshape(-1):
