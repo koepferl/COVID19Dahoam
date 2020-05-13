@@ -916,7 +916,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
     credit2 = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE'
     
-    link = axs[2,3].text(x_pos, 0.1, credit2, fontsize=8, va = 'top')    
+    link = axs[2,3].text(x_pos, 0.5, credit2, fontsize=8, va = 'top')    
     link = axs3[2,3].text(x_pos, -2, credit2, fontsize=8)
     link = axs4[2,3].text(x_pos, -1., credit2, fontsize=8)
     link = axs2[2,3].text(3.5, 0.5, credit2, fontsize=8, va='top')
@@ -930,10 +930,14 @@ def plot_DT(DT, state, ncol=4, nrow=3):
 
     
     for ax in axs.reshape(-1):
-        ax.set_ylim(1.,500.9)
+        ax.set_ylim(1.5,500.9)
         ax.set_xlim(13,day_max)
     
+        from matplotlib.ticker import ScalarFormatter
+        for axis in [ax.xaxis, ax.yaxis]:
+            axis.set_major_formatter(ScalarFormatter())
         ax.grid(True, which="both")
+
         ax.set_xticks(np.arange(14, day_max, 4))
         ax.set_xticklabels([14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17])
     
