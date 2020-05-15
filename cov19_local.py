@@ -916,7 +916,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
     credit2 = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE'
     
-    link = axs[2,3].text(x_pos, 0.5, credit2, fontsize=8, va = 'top')    
+    link = axs[2,3].text(x_pos, 0.7, credit2, fontsize=8, va = 'top')    
     link = axs3[2,3].text(x_pos, -2, credit2, fontsize=8)
     link = axs4[2,3].text(x_pos, -1., credit2, fontsize=8)
     link = axs2[2,3].text(3.5, 0.5, credit2, fontsize=8, va='top')
@@ -944,9 +944,9 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.legend(loc='upper left')
     
         #if ax in [axs[2,0], axs[2,1], axs[2,2], axs[2,3]]:
-        ax.text(13, 0.5, 'Maerz/March')
-        ax.text(31, 0.5, 'April')
-        ax.text(31+30, 0.5, 'Mai/May')
+        ax.text(13, 0.8, 'Maerz/March')
+        ax.text(31, 0.8, 'April')
+        ax.text(31+30, 0.8, 'Mai/May')
     
             
     for ax2 in axs2.reshape(-1):
