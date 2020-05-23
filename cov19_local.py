@@ -227,7 +227,8 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     day = day[num_dic['fall'] > 0]
     month = month[num_dic['fall'] > 0]
-    day_max = 80.
+    day_max = 100.
+    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6]
     
     
     fig, ax = plt.subplots(4, figsize=(10,22), gridspec_kw={'height_ratios': [3, 1, 1, 1]})
@@ -252,6 +253,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     day[month == 1] = day[month == 1] - 29 - 31
     day[month == 4] = day[month == 4] + 31
     day[month == 5] = day[month == 5] + 31 + 30
+    day[month == 6] = day[month == 6] + 31 + 30 + 31
     
     #print 'day now', day
     #print 'day_real', day_real
@@ -418,12 +420,14 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
         axis.set_major_formatter(ScalarFormatter())
     
     ax[0].grid(True, which="both")
-    ax[0].set_xticks(np.arange(14, day_max, 2))
-    ax[0].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+    ax[0].set_xticks(np.arange(14, day_max, 4))
+    ax[0].set_xticklabels(day_ticks)
     
     ax[0].text(13, 0.4, 'Mar')
     ax[0].text(31, 0.4, 'Apr')
     ax[0].text(31+30, 0.4, 'Mai')
+    ax[0].text(31+30+31, 0.4, 'Juni')
+    
     ax[0].annotate('Ausgangssperre', ha='center', xy=(21, ax[0].get_ylim()[0]), xytext=(21, 0.4), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[0].annotate('Ostern', ha='center', xy=(31+12, ax[0].get_ylim()[0]), xytext=(31+12, 0.4), 
@@ -523,12 +527,14 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     ax[1].set_axisbelow(True)
     ax[1].grid(True, which="both")
-    ax[1].set_xticks(np.arange(14, day_max, 2))
-    ax[1].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+    ax[1].set_xticks(np.arange(14, day_max, 4))
+    ax[1].set_xticklabels(day_ticks)
     
     tx1 = ax[1].text(13, 0.2, 'Mar')
     tx2 = ax[1].text(31, 0.2, 'Apr')
     tx3 = ax[1].text(31+30, 0.2, 'Mai')
+    tx4 = ax[1].text(31+30+31, 0.2, 'Juni')
+    
     ax[1].annotate('Ausgangssperre', ha='center', xy=(21, ax[1].get_ylim()[0]), xytext=(21, 0.2), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[1].annotate('Ostern', ha='center', xy=(31+12, ax[1].get_ylim()[0]), xytext=(31+12, 0.2), 
@@ -559,14 +565,16 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     #print 'diff', np.diff(DTs)
     
     ax[2].grid(True, which="both")
-    ax[2].set_xticks(np.arange(14, day_max, 2))
-    ax[2].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+    ax[2].set_xticks(np.arange(14, day_max, 4))
+    ax[2].set_xticklabels(day_ticks)
     
     ax[2].legend(loc='best')
     offset = ax[2].get_ylim()[0] - (ax[2].get_ylim()[1] - ax[2].get_ylim()[0]) / 5.
     tx1 = ax[2].text(13, offset, 'Mar')
     tx2 = ax[2].text(31, offset, 'Apr')
     tx3 = ax[2].text(31+30, offset, 'Mai')
+    tx4 = ax[2].text(31+30+31, offset, 'Juni')
+
     ax[2].annotate('Ausgangssperre', ha='center', xy=(21, ax[2].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[2].annotate('Ostern', ha='center', xy=(31+12, ax[2].get_ylim()[0]), xytext=(31+12, offset), 
@@ -614,14 +622,15 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[3].plot(day[R_number_interp >= 1], R_number_interp[R_number_interp >= 1], '^', color=plt.cm.Reds(200), label='Achtung: R > 1 (!!!)') 
     
     ax[3].grid(True, which="both")
-    ax[3].set_xticks(np.arange(14, day_max, 2))
-    ax[3].set_xticklabels([14, 16, 18, 20, 22, 24, 26, 28, 30, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 1, 3, 5, 7, 9, 11, 13, 15, 17])
+    ax[3].set_xticks(np.arange(14, day_max, 4))
+    ax[3].set_xticklabels(day_ticks)
     ax[3].legend(loc='best')
     
     offset = ax[3].get_ylim()[0] - (ax[3].get_ylim()[1] - ax[3].get_ylim()[0]) / 5.
     tx1 = ax[3].text(13, offset, 'Mar')
     tx2 = ax[3].text(31, offset, 'Apr')
     tx3 = ax[3].text(31+30, offset, 'Mai')
+    tx4 = ax[3].text(31+30+31, offset, 'Juni')
     ax[3].annotate('Ausgangssperre', ha='center', xy=(21, ax[3].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[3].annotate('Ostern', ha='center', xy=(31+12, ax[3].get_ylim()[0]), xytext=(31+12, offset), 
@@ -648,7 +657,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
                'zu Abb. 4: \nReproduktionszahl gibt die Anzahl der \nWeiteransteckungen durch einen Infizierten an. \nReproduktionszahl groesser als 1 ist bedenklich. \n(Ziel: Reproduktionszahl viel kleiner als 1).'
                )
     
-    fig.savefig('expert/' + name + '_expert.pdf', dpi=300, overwrite=True, bbox_inches='tight', bbox_extra_artists=(lgd, tx1, tx2))
+    fig.savefig('expert/' + name + '_expert.pdf', dpi=300, overwrite=True, bbox_inches='tight', bbox_extra_artists=(lgd, tx1, tx2, tx3, tx4))
     
     
     ##################
@@ -728,7 +737,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     # move to March time frame
     #########
     
-    day_max = 80.
+    day_max = 100.
+    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6]
     
     dat_states = state[1]
     
@@ -740,6 +750,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         if m == '03': state_day.append(int(d))
         if m == '04': state_day.append(int(d) + 31) 
         if m == '05': state_day.append(int(d) + 31 + 30) 
+        if m == '06': state_day.append(int(d) + 31 + 30 + 31) 
     
     #########
     # fit
@@ -912,7 +923,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     # axis
     
     #factor_1 = 100/60.
-    x_pos = 37
+    x_pos = 57
     
     credit2 = 'Christine Greif\nhttp://www.usm.uni-muenchen.de/~koepferl\nThis work is licensed under CC-BY-SA 4.0\nData: NPGEO-DE'
     
@@ -939,7 +950,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.grid(True, which="both")
 
         ax.set_xticks(np.arange(14, day_max, 4))
-        ax.set_xticklabels([14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17])
+        ax.set_xticklabels(day_ticks)
     
         ax.legend(loc='upper left')
     
@@ -947,6 +958,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.text(13, 0.8, 'Maerz/March')
         ax.text(31, 0.8, 'April')
         ax.text(31+30, 0.8, 'Mai/May')
+        ax.text(31+30+31, 0.8, 'Juni/June')
     
             
     for ax2 in axs2.reshape(-1):
@@ -971,7 +983,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
         ax3.grid(True, which="both")
         ax3.set_xticks(np.arange(14, day_max, 4))
-        ax3.set_xticklabels([14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17])
+        ax3.set_xticklabels(day_ticks)
         
         if ax3 in [axs3[0,0], axs3[1,0], axs3[2,0]]:
             ax3.set_ylabel('Sterberaten in %')
@@ -992,7 +1004,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     
         ax4.grid(True, which="both")
         ax4.set_xticks(np.arange(14, day_max, 4))
-        ax4.set_xticklabels([14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17])
+        ax4.set_xticklabels(day_ticks)
     
         ax4.legend(loc='upper left')
     
