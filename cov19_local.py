@@ -423,10 +423,10 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[0].set_xticks(np.arange(14, day_max, 4))
     ax[0].set_xticklabels(day_ticks)
     
-    ax[0].text(13, 0.4, 'Mar')
-    ax[0].text(31, 0.4, 'Apr')
-    ax[0].text(31+30, 0.4, 'Mai')
-    ax[0].text(31+30+31, 0.4, 'Juni')
+    ax[0].text(13, 0.5, 'Mar')
+    ax[0].text(31, 0.5, 'Apr')
+    ax[0].text(31+30, 0.5, 'Mai')
+    ax[0].text(31+30+31, 0.5, 'Juni')
     
     ax[0].annotate('Ausgangssperre', ha='center', xy=(21, ax[0].get_ylim()[0]), xytext=(21, 0.4), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -530,10 +530,10 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[1].set_xticks(np.arange(14, day_max, 4))
     ax[1].set_xticklabels(day_ticks)
     
-    tx1 = ax[1].text(13, 0.2, 'Mar')
-    tx2 = ax[1].text(31, 0.2, 'Apr')
-    tx3 = ax[1].text(31+30, 0.2, 'Mai')
-    tx4 = ax[1].text(31+30+31, 0.2, 'Juni')
+    tx1 = ax[1].text(13, 0.3, 'Mar')
+    tx2 = ax[1].text(31, 0.3, 'Apr')
+    tx3 = ax[1].text(31+30, 0.3, 'Mai')
+    tx4 = ax[1].text(31+30+31, 0.3, 'Juni')
     
     ax[1].annotate('Ausgangssperre', ha='center', xy=(21, ax[1].get_ylim()[0]), xytext=(21, 0.2), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -575,7 +575,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     tx3 = ax[2].text(31+30, offset, 'Mai')
     tx4 = ax[2].text(31+30+31, offset, 'Juni')
 
-    ax[2].annotate('Ausgangssperre', ha='center', xy=(21, ax[2].get_ylim()[0]), xytext=(21, offset), 
+    ax[2].annotate('Lock-down', ha='center', xy=(21, ax[2].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[2].annotate('Ostern', ha='center', xy=(31+12, ax[2].get_ylim()[0]), xytext=(31+12, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -631,7 +631,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     tx2 = ax[3].text(31, offset, 'Apr')
     tx3 = ax[3].text(31+30, offset, 'Mai')
     tx4 = ax[3].text(31+30+31, offset, 'Juni')
-    ax[3].annotate('Ausgangssperre', ha='center', xy=(21, ax[3].get_ylim()[0]), xytext=(21, offset), 
+    ax[3].annotate('Lock-down', ha='center', xy=(21, ax[3].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[3].annotate('Ostern', ha='center', xy=(31+12, ax[3].get_ylim()[0]), xytext=(31+12, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
