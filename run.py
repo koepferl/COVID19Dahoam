@@ -2,7 +2,7 @@ from cov19_local import load_RKI, plot_corona, plot_DT, docu
 
 import numpy as np
 
-date = '2020-05-31'
+date = '2020-06-09'
 
 # County ID for Bavaria - Landkreis ID fuer Bayern
 LK_ID = np.array(['09771', '09171', '09371', '09571', '09671', '09772', '09672',
