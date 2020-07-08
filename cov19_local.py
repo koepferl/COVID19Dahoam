@@ -227,8 +227,8 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     day = day[num_dic['fall'] > 0]
     month = month[num_dic['fall'] > 0]
-    day_max = 100.
-    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6]
+    day_max = 150.
+    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6, 10, 14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27]
     
     
     fig, ax = plt.subplots(4, figsize=(10,22), gridspec_kw={'height_ratios': [3, 1, 1, 1]})
@@ -254,6 +254,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     day[month == 4] = day[month == 4] + 31
     day[month == 5] = day[month == 5] + 31 + 30
     day[month == 6] = day[month == 6] + 31 + 30 + 31
+    day[month == 7] = day[month == 7] + 31 + 30 + 31 + 30
     
     #print 'day now', day
     #print 'day_real', day_real
@@ -427,6 +428,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     ax[0].text(31, 0.5, 'Apr')
     ax[0].text(31+30, 0.5, 'Mai')
     ax[0].text(31+30+31, 0.5, 'Juni')
+    ax[0].text(31+30+31+30, 0.5, 'Juli')
     
     ax[0].annotate('Ausgangssperre', ha='center', xy=(21, ax[0].get_ylim()[0]), xytext=(21, 0.4), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -534,6 +536,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     tx2 = ax[1].text(31, 0.3, 'Apr')
     tx3 = ax[1].text(31+30, 0.3, 'Mai')
     tx4 = ax[1].text(31+30+31, 0.3, 'Juni')
+    tx5 = ax[1].text(31+30+31+30, 0.3, 'Juli')
     
     ax[1].annotate('Ausgangssperre', ha='center', xy=(21, ax[1].get_ylim()[0]), xytext=(21, 0.2), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -574,6 +577,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     tx2 = ax[2].text(31, offset, 'Apr')
     tx3 = ax[2].text(31+30, offset, 'Mai')
     tx4 = ax[2].text(31+30+31, offset, 'Juni')
+    tx5 = ax[2].text(31+30+31+30, offset, 'Juli')
 
     ax[2].annotate('Lock-down', ha='center', xy=(21, ax[2].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
@@ -631,6 +635,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     tx2 = ax[3].text(31, offset, 'Apr')
     tx3 = ax[3].text(31+30, offset, 'Mai')
     tx4 = ax[3].text(31+30+31, offset, 'Juni')
+    tx5 = ax[3].text(31+30+31+30, offset, 'Juli')
     ax[3].annotate('Lock-down', ha='center', xy=(21, ax[3].get_ylim()[0]), xytext=(21, offset), 
                     arrowprops=dict(arrowstyle= '-|>', color='grey', lw=2, ls='-'), alpha=0.6)
     ax[3].annotate('Ostern', ha='center', xy=(31+12, ax[3].get_ylim()[0]), xytext=(31+12, offset), 
@@ -657,7 +662,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
                'zu Abb. 4: \nReproduktionszahl gibt die Anzahl der \nWeiteransteckungen durch einen Infizierten an. \nReproduktionszahl groesser als 1 ist bedenklich. \n(Ziel: Reproduktionszahl viel kleiner als 1).'
                )
     
-    fig.savefig('expert/' + name + '_expert.pdf', dpi=300, overwrite=True, bbox_inches='tight', bbox_extra_artists=(lgd, tx1, tx2, tx3, tx4))
+    fig.savefig('expert/' + name + '_expert.pdf', dpi=300, overwrite=True, bbox_inches='tight', bbox_extra_artists=(lgd, tx1, tx2, tx3, tx4, tx5))
     
     
     ##################
@@ -676,7 +681,7 @@ def plot_corona(num_dic, day, month, name, ID, geraet_min=None, geraet_max=None,
     
     #extent = ax[0].get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     # Pad the saved area by 10% in the x-direction and 20% in the y-direction
-    fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, bbox_extra_artists=(lgd, tx1, tx2, tx3), bbox_inches='tight')
+    fig.savefig('plots/' + name + '.pdf', dpi=300, overwrite=True, bbox_extra_artists=(lgd, tx1, tx2, tx3, tx4, tx5), bbox_inches='tight')
                     
     rates = {'death_rate': num_tod / num * 100, 
              'recover_rate': num_gesund / num * 100, 
@@ -737,8 +742,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
     # move to March time frame
     #########
     
-    day_max = 100.
-    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6]
+    day_max = 150.
+    day_ticks = [14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27, 1, 5, 9, 13, 17, 21, 25, 29, 2, 6, 10, 14, 18, 22, 26, 30, 3, 7, 11, 15, 19, 23, 27]
     
     dat_states = state[1]
     
@@ -751,6 +756,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         if m == '04': state_day.append(int(d) + 31) 
         if m == '05': state_day.append(int(d) + 31 + 30) 
         if m == '06': state_day.append(int(d) + 31 + 30 + 31) 
+        if m == '07': state_day.append(int(d) + 31 + 30 + 31 + 30) 
     
     #########
     # fit
@@ -959,6 +965,7 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax.text(31, 0.8, 'April')
         ax.text(31+30, 0.8, 'Mai/May')
         ax.text(31+30+31, 0.8, 'Juni/June')
+        ax.text(31+30+31+30, 0.8, 'Juli/July')
     
             
     for ax2 in axs2.reshape(-1):
@@ -996,6 +1003,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax3.text(13, offset3, 'Maerz/March')
         ax3.text(31, offset3, 'April')
         ax3.text(31+30, offset3, 'Mai/May')
+        ax3.text(31+30+31, offset3, 'Juni/June')
+        ax3.text(31+30+31+30, offset3, 'Juli/July')
         
     
     for ax4 in axs4.reshape(-1):
@@ -1013,6 +1022,8 @@ def plot_DT(DT, state, ncol=4, nrow=3):
         ax4.text(13, offset4, 'Maerz/March')
         ax4.text(31, offset4, 'April')
         ax4.text(31+30, offset4, 'Mai/May')
+        ax4.text(31+30+31, offset4, 'Juni/June')
+        ax4.text(31+30+31+30, offset4, 'Juli/July')
         
         if ax4 in [axs4[1,0]]:
             ax4.set_ylabel('geschaetzte Reproduktionszahl R (Anzahl letzten 4 Meldungen / Anzahl der letzten 4 Meldungen davor)')
